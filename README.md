@@ -1,2 +1,0 @@
-# pryfinal
-Proyecto Final
