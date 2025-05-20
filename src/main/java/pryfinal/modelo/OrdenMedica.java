@@ -1,4 +1,4 @@
-package gid.modelo;
+package pryfinal.modelo;
 
 public class OrdenMedica {
     

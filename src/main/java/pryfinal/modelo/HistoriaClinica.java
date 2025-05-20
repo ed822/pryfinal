@@ -1,4 +1,4 @@
-package gid.modelo;
+package pryfinal.modelo;
 import java.time.LocalDate;
 /*
 Antecedentes: enfermedades previas, cirugías, medicamentos que toma, alergias, vacunas.

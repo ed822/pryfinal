@@ -1,4 +1,4 @@
-package gid;
+package pryfinal;
 
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;

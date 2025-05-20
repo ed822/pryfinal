@@ -1,4 +1,4 @@
-package gid.modelo;
+package pryfinal.modelo;
 
 public class Mascota {
     //cedulaDueño, historiaClinica guardaran un codigo unico que servira de clave primaria para representar a una entidad con mas informacion
