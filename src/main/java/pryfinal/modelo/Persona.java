@@ -1,61 +1,40 @@
+// Paquete
 package pryfinal.modelo;
+
+// Clase Persona
 public class Persona {
-    private String nombre;
-    private String apellido;
-    private String cedula;
-    private String celular;
-    private int edad;
-    private String direccion;
-    
-    public Persona (String n, String a, String cd, String cl, int e, String d) {
-        this.nombre= n;
-        this.apellido= a;
-        this.cedula= cd;
-        this.celular= cl;
-        this.edad= e;
-        this.direccion= d;
-    }
+	// Variables
+	private String cedula;
+	private String nombre;
+	private String apellido;
+	private String tipo;
+	private String celular;
+	private String direccion;
+	private String email;
 
-    public void setNombre(String no) {
-        this.nombre= no;
-    }
-    public String getNombre() {
-        return this.nombre;
-    }
+	// Contructor
+	public Persona (String cedula, String nombre, String apellido, String tipo, String celular, String direccion, String email) {
+		this.cedula = cedula;
+		this.nombre = nombre;
+		this.apellido = apellido;
+		this.celular = celular;
+		this.direccion = direccion;
+		this.email = email;
+	}
 
-    public void setApellido(String ap) {
-        this.apellido= ap;
-    }
-    public String getApellido() {
-        return this.apellido;
-    }
+	// Setters
+	public void setCedula(String cedula) { this.cedula = cedula; }
+	public void setNombre(String nombre) { this.nombre = nombre; }
+	public void setApellido(String apellido) { this.apellido = apellido; }
+	public void setCelular(String celular) { this.celular = celular; }
+	public void setDireccion (String direccion) { this.direccion = direccion; }
+	public void setEmail(String email) { this.email = email; }
 
-    public void setCedula(String ced) {
-        this.cedula= ced;
-    }
-    public String getCedula() {
-        return this.cedula;
-    }
-
-    public void setCelular(String cel) {
-        this.celular= cel;
-    }
-    public String getCelular() {
-        return this.celular;
-    }
-
-    public void setEdad(int ed) {
-        this.edad= ed;
-    }
-    public int getEdad() {
-        return this.edad;
-    }
-
-    public void setDireccion(String di) {
-        this.direccion= di;
-    }
-    public String getDireccion() {
-        return this.direccion;
-    }
-
+	// Getters
+	public String getCedula() { return this.cedula; }
+	public String getNombre() { return this.nombre; }
+	public String getApellido() { return this.apellido; }
+	public String getCelular() { return this.celular; }
+	public String getDireccion() { return this.direccion; }
+	public String getEmail() { return this.email; }
 }

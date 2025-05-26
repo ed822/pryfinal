@@ -1,12 +1,15 @@
+// Paquete
 package pryfinal;
 
+// Imports
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-
 import java.io.IOException;
 
+
+// Clase App (main)
 public class App extends Application {
     @Override
     public void start(Stage stage) throws IOException {

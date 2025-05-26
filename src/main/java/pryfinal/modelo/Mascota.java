@@ -1,100 +1,47 @@
+// Paquetes
 package pryfinal.modelo;
 
+//cedulaDueño, historiaClinica guardaran un codigo unico que servira de clave primaria para representar a una entidad con mas informacion
+//Esto se hara con el objetivo de no sobrecargar esta clase de informacion y tener todo mucho mas ordenado
+//estadoActual no se si usarlo tambien de clave primaria para un reporte mas detallado o si solo sea unos parrafos de texto que digan el estado de la mascota
+
+// Clase Mascota
 public class Mascota {
-    //cedulaDueño, historiaClinica guardaran un codigo unico que servira de clave primaria para representar a una entidad con mas informacion
-    //Esto se hara con el objetivo de no sobrecargar esta clase de informacion y tener todo mucho mas ordenado
-    //estadoActual no se si usarlo tambien de clave primaria para un reporte mas detallado o si solo sea unos parrafos de texto que digan el estado de la mascota
-    private String nombre;
-    private String especie;
-    private String raza;
-    private int edad;
-    private int peso;
-    private int altura;
-    private boolean sexo;
-    private String cedulaDueño;
-    private String historiaClinica;
-    private String estadoActual;
+	// Variables
+	private String cedula;
+	private String nombre;
+	private String especie;
+	private int edad;
+	private boolean sexo;
+	private String raza;
+	private int peso;
 
-    public Mascota(String n, String es, String r, int ed, int p, int a, boolean s, String cd, String hc, String ea) {
-        this.nombre= n;
-        this.especie= es;
-        this.raza= r;
-        this.edad= ed;
-        this.peso= p;
-        this.altura= a;
-        this.sexo= s;
-        this.cedulaDueño= cd;
-        this.historiaClinica= hc;
-        this.estadoActual= ea;
-    }
+	// Contructor
+	public Mascota(String cedula, String nombre, String especie, int edad, boolean sexo, String raza, int peso) {
+		this.cedula = cedula;
+		this.nombre = nombre;
+		this.especie = especie;
+		this.edad = edad;
+		this.sexo = sexo;
+		this.raza = raza;
+		this.peso = peso;
+	}
 
-    public void setNombre(String no) {
-        this.nombre= no;
-    }
-    public String getNombre() {
-        return this.nombre;
-    }
+	// Setters
+	public void setCedula(String cedula) { this.cedula = cedula; }
+	public void setNombre(String nombre) { this.nombre= nombre; }
+	public void setEspecie(String especie) { this.especie= especie; }
+	public void setEdad(int edad) { this.edad= edad; }
+	public void setSexo(boolean sexo) { this.sexo= sexo; }
+	public void setRaza(String raza) { this.raza= raza; }
+	public void setPeso(int peso) { this.peso= peso; }
 
-    public void setEspecie(String esp) {
-        this.especie= esp;
-    }
-    public String getEspecie() {
-        return this.especie;
-    }
-
-    public void setRaza(String ra) {
-        this.raza= ra;
-    }
-    public String getRaza() {
-        return this.raza;
-    }
-
-    public void setEdad(int ed) {
-        this.edad= ed;
-    }
-    public int getEdad() {
-        return this.edad;
-    }
-    
-    public void setPeso(int pe) {
-        this.peso= pe;
-    }
-    public int getPeso() {
-        return this.peso;
-    }
-
-    public void setAltura(int al) {
-        this.altura= al;
-    }
-    public int getAltura() {
-        return this.altura;
-    }
-
-    public void setSexo(boolean se) {
-        this.sexo= se;
-    }
-    public boolean getSexo() {
-        return this.sexo;
-    }
-
-    public void setCedula(String ced) {
-        this.cedulaDueño= ced;
-    }
-    public String getCedula() {
-        return this.cedulaDueño;
-    }
-
-    public void setHistoria(String his) {
-        this.historiaClinica= his;
-    }
-    public String getHistoria() {
-        return this.historiaClinica;
-    }
-
-    public void setEstado(String est) {
-        this.estadoActual= est;
-    }
-    public String getEstado() {
-        return this.estadoActual;
-    }
+	// Getters
+	public String getCedula() { return this.cedula; }
+	public String getNombre() { return this.nombre; }
+	public String getEspecie() { return this.especie; }
+	public int getEdad() { return this.edad; }
+	public boolean getSexo() { return this.sexo; }
+	public String getRaza() { return this.raza; }
+	public int getPeso() { return this.peso; }
 }

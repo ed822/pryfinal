@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+
+<GridPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="pryfinal.controlador.RegistroHistoriaClinica" hgap="10" vgap="10" style="-fx-padding: 20;">
+
+	<columnConstraints>
+		<ColumnConstraints minWidth="170" prefWidth="170" />
+		<ColumnConstraints hgrow="ALWAYS" minWidth="250" prefWidth="350"/>
+	</columnConstraints>
+
+	<!-- Cédula del Dueño -->
+	<Label text="Cédula del Dueño:" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+	<TextField fx:id="txtCedulaDuenoHC" promptText="Cédula del dueño" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+
+	<!-- Nombre de Mascota -->
+	<Label text="Nombre de Mascota:" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
+	<TextField fx:id="txtIdNombreMascotaHC" promptText="Identificador o nombre de la mascota" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+
+	<!-- Fecha de Visita -->
+	<Label text="Fecha de Visita:" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
+	<DatePicker fx:id="dateFechaVisitaHC" promptText="Seleccionar fecha" GridPane.columnIndex="1" GridPane.rowIndex="2" prefWidth="350.0"/>
+
+	<!-- Veterinario Encargado -->
+	<Label text="Veterinario Encargado:" GridPane.columnIndex="0" GridPane.rowIndex="3"/>
+	<TextField fx:id="txtVeterinarioEncargado" promptText="Nombre del veterinario" GridPane.columnIndex="1" GridPane.rowIndex="3"/>
+
+	<!-- Motivo de la Consulta -->
+	<Label text="Motivo de la Consulta:" GridPane.columnIndex="0" GridPane.rowIndex="4" GridPane.valignment="TOP"/>
+	<TextArea fx:id="areaMotivoConsulta" promptText="Razón de la visita" GridPane.columnIndex="1" GridPane.rowIndex="4" prefHeight="80.0" wrapText="true"/>
+
+	<!-- Diagnóstico -->
+	<Label text="Diagnóstico:" GridPane.columnIndex="0" GridPane.rowIndex="5" GridPane.valignment="TOP"/>
+	<TextArea fx:id="areaDiagnostico" promptText="Diagnóstico realizado por el veterinario" GridPane.columnIndex="1" GridPane.rowIndex="5" prefHeight="100.0" wrapText="true"/>
+
+	<!-- Tratamiento Indicado -->
+	<Label text="Tratamiento Indicado:" GridPane.columnIndex="0" GridPane.rowIndex="6" GridPane.valignment="TOP"/>
+	<TextArea fx:id="areaTratamientoIndicado" promptText="Tratamiento y medicación prescrita" GridPane.columnIndex="1" GridPane.rowIndex="6" prefHeight="100.0" wrapText="true"/>
+
+	<!-- Observaciones -->
+	<Label text="Observaciones Adicionales:" GridPane.columnIndex="0" GridPane.rowIndex="7" GridPane.valignment="TOP"/>
+	<TextArea fx:id="areaObservacionesHC" promptText="Notas adicionales relevantes" GridPane.columnIndex="1" GridPane.rowIndex="7" prefHeight="80.0" wrapText="true"/>
+
+	<!-- Botón Registrar Historia Clínica -->
+	<Button fx:id="btnRegistrarHistoria" text="Registrar Entrada" onAction="#handleRegistrarHistoria" GridPane.columnIndex="1" GridPane.rowIndex="8" GridPane.halignment="RIGHT">
+		<GridPane.margin>
+			<Insets top="20" />
+		</GridPane.margin>
+	</Button>
+</GridPane>
