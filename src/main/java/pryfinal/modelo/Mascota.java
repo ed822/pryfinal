@@ -1,10 +1,6 @@
 // Paquete
 package pryfinal.modelo;
 
-//cedulaDueño, historiaClinica guardaran un codigo unico que servira de clave primaria para representar a una entidad con mas informacion
-//Esto se hara con el objetivo de no sobrecargar esta clase de informacion y tener todo mucho mas ordenado
-//estadoActual no se si usarlo tambien de clave primaria para un reporte mas detallado o si solo sea unos parrafos de texto que digan el estado de la mascota
-
 // Clase Mascota
 public class Mascota {
 	// Variables

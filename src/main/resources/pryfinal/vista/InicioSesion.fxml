@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.collections.FXCollections?>
+<?import java.lang.String?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.layout.ColumnConstraints?>
+
+<GridPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="pryfinal.controlador.InicioSesion" alignment="CENTER" hgap="10" vgap="15" style="-fx-padding: 40;">
+
+	<columnConstraints>
+		<ColumnConstraints minWidth="120" prefWidth="120"/>
+		<ColumnConstraints hgrow="ALWAYS" minWidth="200" prefWidth="250"/>
+	</columnConstraints>
+
+	<Label text="Inicio de Sesión" GridPane.columnIndex="0" GridPane.rowIndex="0" GridPane.columnSpan="2" alignment="CENTER" style="-fx-font-size: 24px; -fx-font-weight: bold;">
+		<GridPane.margin>
+			<Insets bottom="20.0"/>
+		</GridPane.margin>
+	</Label>
+
+	<!-- Tipo de Usuario -->
+	<Label text="Tipo de Usuario:" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
+	<ComboBox fx:id="cmbTipoUsuario" promptText="Seleccione tipo" GridPane.columnIndex="1" GridPane.rowIndex="1" prefWidth="250.0">
+		<items>
+			<FXCollections fx:factory="observableArrayList">
+				<String fx:value="admin"/>
+				<String fx:value="veterinario"/>
+				<String fx:value="vendedor"/>
+			</FXCollections>
+		</items>
+	</ComboBox>
+
+	<!-- Nombre de Usuario -->
+	<Label text="Nombre de Usuario:" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
+	<TextField fx:id="txtNombreUsuario" promptText="Ingrese su usuario" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
+
+	<!-- Contraseña -->
+	<Label text="Contraseña:" GridPane.columnIndex="0" GridPane.rowIndex="3"/>
+	<PasswordField fx:id="txtContrasena" promptText="Ingrese su contraseña" GridPane.columnIndex="1" GridPane.rowIndex="3"/>
+
+	<!-- Botones -->
+	<HBox spacing="15" alignment="CENTER_RIGHT" GridPane.columnIndex="1" GridPane.rowIndex="4">
+		<GridPane.margin>
+			<Insets top="20.0"/>
+		</GridPane.margin>
+		<Button fx:id="btnRegistrarUsuario" text="Registrar" onAction="#handleRegistrarUsuario" prefWidth="100"/>
+		<Button fx:id="btnIniciarSesion" text="Iniciar Sesión" onAction="#handleIniciarSesion" prefWidth="120" defaultButton="true"/>
+	</HBox>
+</GridPane>

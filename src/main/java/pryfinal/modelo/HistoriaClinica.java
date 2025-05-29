@@ -1,18 +1,6 @@
 // Paquete
 package pryfinal.modelo;
 
-// Imports
-import java.time.LocalDate;
-
-/*
-Antecedentes: enfermedades previas, cirugías, medicamentos que toma, alergias, vacunas.
-Pruebas diagnósticas: Radiografías, análisis de sangre, etc.
-Tratamientos: Vacunas, medicamentos, etc.
-Procesos médicos: Desparasitación, cirugía, etc.
-Plan de tratamiento: medicamentos, dosis, duración del tratamiento, cuidados especiales. 
-Evolución del paciente: seguimiento del tratamiento, progreso o regresión de los síntomas. 
-*/
-
 // Clase HistoriaClinica
 public class HistoriaClinica {
 	// Variables
