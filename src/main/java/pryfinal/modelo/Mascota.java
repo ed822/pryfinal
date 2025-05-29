@@ -1,4 +1,4 @@
-// Paquetes
+// Paquete
 package pryfinal.modelo;
 
 //cedulaDueño, historiaClinica guardaran un codigo unico que servira de clave primaria para representar a una entidad con mas informacion
@@ -16,7 +16,7 @@ public class Mascota {
 	private String raza;
 	private int peso;
 
-	// Contructor
+	// Constructor
 	public Mascota(String cedula, String nombre, String especie, int edad, boolean sexo, String raza, int peso) {
 		this.cedula = cedula;
 		this.nombre = nombre;

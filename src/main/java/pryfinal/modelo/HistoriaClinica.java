@@ -25,7 +25,7 @@ public class HistoriaClinica {
 	private String observaciones;
 	private String veterinario;
 
-	// Contructor
+	// Constructor
 	public HistoriaClinica(String cedula, String nombre, String fecha, String motivo,
 			String diagnostico, String tratamiento, String observaciones, String veterinario) {
 		this.cedula = cedula;

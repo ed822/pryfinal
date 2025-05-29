@@ -14,7 +14,7 @@ public class Factura {
 	private double total;
 	private String metodo;
 
-	// Contructor
+	// Constructor
 	public Factura(String factura, String fecha, String cedula, String nombre,
 			String descripcion, double subtotal, int iva, double total, String metodo) {
 		this.factura = factura;

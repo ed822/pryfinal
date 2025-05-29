@@ -12,7 +12,7 @@ public class Persona {
 	private String direccion;
 	private String email;
 
-	// Contructor
+	// Constructor
 	public Persona (String cedula, String nombre, String apellido, String tipo, String celular, String direccion, String email) {
 		this.cedula = cedula;
 		this.nombre = nombre;
