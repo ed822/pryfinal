@@ -24,13 +24,13 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+//import java.nio.file.Files; // No usado directamente aquí
+//import java.nio.file.Paths; // No usado directamente aquí
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
+//import java.util.Objects; // No usado directamente aquí
 import java.util.Optional;
 import java.util.Formatter;
 
@@ -67,7 +67,6 @@ public class InicioSesion {
 		objectMapper = new ObjectMapper();
 		objectMapper.enable(SerializationFeature.INDENT_OUTPUT); // Para JSON legible
 
-		// Asegurar que el directorio de datos exista
 		File directorioDatos = new File(RUTA_DIRECTORIO_DATOS);
 		if (!directorioDatos.exists()) {
 			directorioDatos.mkdirs();
@@ -77,20 +76,16 @@ public class InicioSesion {
 			if (ADMIN_USER_TYPE.equals(newValue)) {
 				txtNombreUsuario.setText(ADMIN_USERNAME);
 				txtNombreUsuario.setDisable(true);
-				// Habilitar o deshabilitar el botón de registro para admin
-				// basado en si ya existe un admin
 				btnRegistrarUsuario.setDisable(verificarSiAdminExiste());
 			} else {
 				if (ADMIN_USERNAME.equals(txtNombreUsuario.getText()) && txtNombreUsuario.isDisabled()) {
 					txtNombreUsuario.clear();
 				}
 				txtNombreUsuario.setDisable(false);
-				btnRegistrarUsuario.setDisable(false); // Habilitar para otros tipos
+				btnRegistrarUsuario.setDisable(false);
 			}
 		});
 
-		// Estado inicial del botón de registro si no hay nada seleccionado
-		// O si se selecciona "admin" al inicio y ya existe uno
 		if (cmbTipoUsuario.getSelectionModel().isEmpty()) {
 			txtNombreUsuario.setDisable(false);
 			btnRegistrarUsuario.setDisable(false);
@@ -131,9 +126,7 @@ public class InicioSesion {
 				mostrarAlerta("Error de Registro", "El usuario 'admin' ya ha sido registrado. No se pueden crear más administradores.");
 				return;
 			}
-			// Si no existe, se procederá a registrar el único admin
 		} else {
-			// Verificar si el usuario (no admin) ya existe
 			boolean usuarioExiste = usuarios.stream()
 				.anyMatch(u -> u.getTipo().equals(tipoUsuario) && u.getNombre().equalsIgnoreCase(nombreUsuario));
 			if (usuarioExiste) {
@@ -149,7 +142,6 @@ public class InicioSesion {
 		if (guardarUsuarios(usuarios)) {
 			mostrarAlerta("Registro Exitoso", "Usuario '" + nombreUsuario + "' (" + tipoUsuario + ") registrado correctamente.");
 			limpiarCampos();
-			// Si se registró el admin, deshabilitar el botón de registro de admin
 			if (ADMIN_USER_TYPE.equals(tipoUsuario)) {
 				btnRegistrarUsuario.setDisable(true);
 			}
@@ -236,7 +228,7 @@ public class InicioSesion {
 			return hashHex;
 		} catch (NoSuchAlgorithmException e) {
 			System.err.println("Error: Algoritmo SHA-256 no encontrado. " + e.getMessage());
-			return "error_hash_" + contrasena; // Fallback inseguro
+			return "error_hash_" + contrasena;
 		}
 	}
 
@@ -245,14 +237,18 @@ public class InicioSesion {
 			FXMLLoader loader = new FXMLLoader(getClass().getResource("/pryfinal/vista/MenuPrincipal.fxml"));
 			Parent root = loader.load();
 
+			// Crear el nuevo escenario para el Menú Principal
+			Stage escenarioMenuPrincipal = new Stage();
+			escenarioMenuPrincipal.setTitle("Menú Principal - Veterinaria");
+			escenarioMenuPrincipal.setScene(new Scene(root, 800, 600));
+
+			// Obtener el controlador del MenuPrincipal y pasarle el usuario Y EL ESCENARIO
 			MenuPrincipal controladorMenuPrincipal = loader.getController();
-			controladorMenuPrincipal.configurarParaUsuario(usuarioLogueado);
+			controladorMenuPrincipal.configurarParaUsuario(usuarioLogueado, escenarioMenuPrincipal);
 
-			Stage stage = new Stage();
-			stage.setTitle("Menú Principal - Veterinaria");
-			stage.setScene(new Scene(root, 800, 600));
-			stage.show();
+			escenarioMenuPrincipal.show();
 
+			// Cerrar la ventana actual de inicio de sesión
 			((Stage) ((Node) event.getSource()).getScene().getWindow()).close();
 
 		} catch (IOException e) {

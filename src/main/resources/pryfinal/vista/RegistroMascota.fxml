@@ -35,7 +35,7 @@
 
 	<!-- Edad -->
 	<Label text="Edad (años):" GridPane.columnIndex="0" GridPane.rowIndex="4"/>
-	<TextField fx:id="txtEdadMascota" promptText="Ej: 5" GridPane.columnIndex="1" GridPane.rowIndex="4"/>
+	<TextField fx:id="txtEdadMascota" promptText="Ej: 5 o 2.5" GridPane.columnIndex="1" GridPane.rowIndex="4"/>
 
 	<!-- Sexo -->
 	<Label text="Sexo:" GridPane.columnIndex="0" GridPane.rowIndex="5"/>
@@ -51,7 +51,7 @@
 
 	<!-- Peso -->
 	<Label text="Peso (kg):" GridPane.columnIndex="0" GridPane.rowIndex="6"/>
-	<TextField fx:id="txtPesoMascota" promptText="Ej: 10.5" GridPane.columnIndex="1" GridPane.rowIndex="6"/>
+	<TextField fx:id="txtPesoMascota" promptText="Ej: 10" GridPane.columnIndex="1" GridPane.rowIndex="6"/>
 
 	<!-- Botón Registrar -->
 	<Button fx:id="btnRegistrarMascota" text="Registrar Mascota" onAction="#handleRegistrarMascota" GridPane.columnIndex="1" GridPane.rowIndex="7" GridPane.halignment="RIGHT">
