@@ -6,7 +6,7 @@ public class Factura {
 	// Variables
 	private String factura;
 	private String fecha;
-	private String cedula;
+	private long cedula;
 	private String nombre;
 	private String descripcion;
 	private double subtotal;
@@ -14,8 +14,11 @@ public class Factura {
 	private double total;
 	private String metodo;
 
+	// Constructor para Jackson
+	public Factura() {}
+
 	// Constructor
-	public Factura(String factura, String fecha, String cedula, String nombre,
+	public Factura(String factura, String fecha, long cedula, String nombre,
 			String descripcion, double subtotal, int iva, double total, String metodo) {
 		this.factura = factura;
 		this.fecha = fecha;
@@ -31,7 +34,7 @@ public class Factura {
 	// Setters
 	public void setFactura(String factura) { this.factura= factura; }
 	public void setFecha(String fecha) { this.fecha= fecha; }
-	public void setCedula(String cedula) { this.cedula = cedula; }
+	public void setCedula(long cedula) { this.cedula = cedula; }
 	public void setNombre(String nombre) { this.nombre= nombre; }
 	public void setDescripcion(String descripcion) { this.descripcion= descripcion; }
 	public void setSubtotal(double subtotal) { this.subtotal= subtotal; }
@@ -42,7 +45,7 @@ public class Factura {
 	// Getters
 	public String getFactura() { return this.factura; }
 	public String getFecha() { return this.fecha; }
-	public String getCedula() { return this.cedula; }
+	public long getCedula() { return this.cedula; }
 	public String getNombre() { return this.nombre; }
 	public String getDescripcion() { return this.descripcion; }
 	public double getSubtotal() { return this.subtotal; }

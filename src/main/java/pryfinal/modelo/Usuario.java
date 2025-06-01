@@ -8,7 +8,7 @@ public class Usuario {
 	private String nombre;
 	private String contrasena;
 
-	// Para json
+	// Constructor para Jackson
 	public Usuario() {}
 
 	// Constructor

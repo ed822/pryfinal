@@ -111,31 +111,32 @@ public class MenuPrincipal {
 		if (btnIrARegistroOrdenMedica != null) btnIrARegistroOrdenMedica.setDisable(true);
 	}
 
-	private void cargarVistaModal(String fxmlFile, String title) {
+	private void cargarVistaModal(String fxmlFile, String title, boolean necesitaUsuario) {
 		try {
 			FXMLLoader loader = new FXMLLoader(getClass().getResource("/pryfinal/vista/" + fxmlFile));
 			Parent root = loader.load();
 
+			// Si la vista necesita el usuario actual (ej: RegistroPersona)
+			if (necesitaUsuario) {
+				Object controladorCargado = loader.getController();
+				if (controladorCargado instanceof RegistroPersona) {
+					((RegistroPersona) controladorCargado).configurarConUsuario(this.usuarioActual);
+				}
+				// Podrías añadir más 'else if' para otros controladores que necesiten el usuario
+			}
+
 			Stage nuevaVentana = new Stage();
 			nuevaVentana.setTitle(title);
 			nuevaVentana.setScene(new Scene(root));
+			nuevaVentana.initModality(Modality.WINDOW_MODAL);
 
-			// Configurar la ventana como MODAL
-			nuevaVentana.initModality(Modality.WINDOW_MODAL); // O APPLICATION_MODAL si prefieres bloquear toda la app
-
-			// Establecer el propietario de la ventana modal (la ventana del Menú Principal)
 			if (this.escenarioPrincipal != null) {
 				nuevaVentana.initOwner(this.escenarioPrincipal);
 			} else {
-				// Fallback si escenarioPrincipal no está seteado (no debería pasar en el flujo normal)
-				// Obtener el escenario actual desde un botón si es necesario (aunque ya lo tenemos)
-				System.err.println("Advertencia: escenarioPrincipal no estaba seteado al abrir ventana modal. Intentando obtener desde el evento.");
-				// Esto podría ser redundante si el botón que llama a este método está en escenarioPrincipal
-				// Node sourceNode = (Node) event.getSource(); // Necesitaríamos el event si usamos este fallback
-				// nuevaVentana.initOwner(sourceNode.getScene().getWindow());
+				System.err.println("Advertencia: escenarioPrincipal no estaba seteado al abrir ventana modal.");
 			}
 
-			nuevaVentana.showAndWait(); // Mostrar la ventana y esperar a que se cierre
+			nuevaVentana.showAndWait();
 
 		} catch (IOException e) {
 			System.err.println("Error al cargar la vista modal: " + fxmlFile + " - " + e.getMessage());
@@ -149,15 +150,15 @@ public class MenuPrincipal {
 	}
 
 	// Los métodos de acción ahora llaman a cargarVistaModal
-	@FXML private void irAConsultaMascota(ActionEvent event) { cargarVistaModal("ConsultaMascota.fxml", "Consultar Mascotas"); }
-	@FXML private void irAConsultaPersona(ActionEvent event) { cargarVistaModal("ConsultaPersona.fxml", "Consultar Personas"); }
-	@FXML private void irAConsultaFactura(ActionEvent event) { cargarVistaModal("ConsultaFactura.fxml", "Consultar Facturas"); }
-	@FXML private void irAConsultaHistoriaClinica(ActionEvent event) { cargarVistaModal("ConsultaHistoriaClinica.fxml", "Consultar Historias Clínicas"); }
-	@FXML private void irAConsultaOrdenMedica(ActionEvent event) { cargarVistaModal("ConsultaOrdenMedica.fxml", "Consultar Órdenes Médicas"); }
+	@FXML private void irAConsultaMascota(ActionEvent event) { cargarVistaModal("ConsultaMascota.fxml", "Consultar Mascotas", false); }
+	@FXML private void irAConsultaPersona(ActionEvent event) { cargarVistaModal("ConsultaPersona.fxml", "Consultar Personas", false); }
+	@FXML private void irAConsultaFactura(ActionEvent event) { cargarVistaModal("ConsultaFactura.fxml", "Consultar Facturas", false); }
+	@FXML private void irAConsultaHistoriaClinica(ActionEvent event) { cargarVistaModal("ConsultaHistoriaClinica.fxml", "Consultar Historias Clínicas", false); }
+	@FXML private void irAConsultaOrdenMedica(ActionEvent event) { cargarVistaModal("ConsultaOrdenMedica.fxml", "Consultar Órdenes Médicas", false); }
 
-	@FXML private void irARegistroMascota(ActionEvent event) { cargarVistaModal("RegistroMascota.fxml", "Registrar Nueva Mascota"); }
-	@FXML private void irARegistroPersona(ActionEvent event) { cargarVistaModal("RegistroPersona.fxml", "Registrar Nueva Persona"); }
-	@FXML private void irARegistroFactura(ActionEvent event) { cargarVistaModal("RegistroFactura.fxml", "Registrar Nueva Factura"); }
-	@FXML private void irARegistroHistoriaClinica(ActionEvent event) { cargarVistaModal("RegistroHistoriaClinica.fxml", "Registrar Entrada de Historia Clínica"); }
-	@FXML private void irARegistroOrdenMedica(ActionEvent event) { cargarVistaModal("RegistroOrdenMedica.fxml", "Registrar Nueva Orden Médica"); }
+	@FXML private void irARegistroMascota(ActionEvent event) { cargarVistaModal("RegistroMascota.fxml", "Registrar Nueva Mascota", false); }
+	@FXML private void irARegistroPersona(ActionEvent event) { cargarVistaModal("RegistroPersona.fxml", "Registrar Nueva Persona", true); } // true aquí
+	@FXML private void irARegistroFactura(ActionEvent event) { cargarVistaModal("RegistroFactura.fxml", "Registrar Nueva Factura", false); }
+	@FXML private void irARegistroHistoriaClinica(ActionEvent event) { cargarVistaModal("RegistroHistoriaClinica.fxml", "Registrar Entrada de Historia Clínica", false); }
+	@FXML private void irARegistroOrdenMedica(ActionEvent event) { cargarVistaModal("RegistroOrdenMedica.fxml", "Registrar Nueva Orden Médica", false); }
 }

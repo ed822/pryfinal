@@ -13,8 +13,7 @@ public class Mascota {
 	private int peso;
 
 	// Constructor para Jackson
-	public Mascota() {
-	}
+	public Mascota() {}
 
 	// Constructor
 	public Mascota(String cedulaDueno, String nombreMascota, String especie, float edad, String sexo, String raza, int peso) {

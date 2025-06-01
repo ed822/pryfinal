@@ -6,7 +6,6 @@
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.ColumnConstraints?>
-<!-- "Tipo" ComboBox -->
 <?import javafx.collections.FXCollections?>
 <?import java.lang.String?>
 <?import javafx.scene.control.ComboBox?>
@@ -21,7 +20,7 @@
 
 	<!-- Cédula -->
 	<Label text="Cédula:" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
-	<TextField fx:id="txtCedulaPersona" promptText="Ej: 123456789" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+	<TextField fx:id="txtCedulaPersona" promptText="Ej: 1234567890" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
 
 	<!-- Nombre -->
 	<Label text="Nombre:" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
@@ -29,24 +28,23 @@
 
 	<!-- Apellido -->
 	<Label text="Apellido:" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
-	<TextField fx:id="txtApellido" promptText="Apellido de la persona" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
+	<TextField fx:id="txtApellido" promptText="Apellido(s) de la persona" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
 
 	<!-- Tipo -->
-	<!-- <Label text="Tipo:" GridPane.columnIndex="0" GridPane.rowIndex="3"/> -->
-	<!-- <TextField fx:id="txtTipoPersona" promptText="Ej: Dueño, Empleado, Veterinario" GridPane.columnIndex="1" GridPane.rowIndex="3"/> -->
-	<Label text="Tipo:" GridPane.columnIndex="0" GridPane.rowIndex="3"/>
+	<Label text="Tipo de Persona:" GridPane.columnIndex="0" GridPane.rowIndex="3"/>
 	<ComboBox fx:id="cmbTipoPersona" GridPane.columnIndex="1" GridPane.rowIndex="3" prefWidth="250.0">
 		<items>
 			<FXCollections fx:factory="observableArrayList">
-				<String fx:value="Dueño de Mascota" />
-				<String fx:value="Veterinario" />
-				<String fx:value="Personal Administrativo" />
+				<String fx:value="Dueño de Mascota"/>
+				<String fx:value="Veterinario"/>
+				<String fx:value="Encargado de bodega"/>
 			</FXCollections>
 		</items>
+		<promptText>Seleccione un tipo</promptText>
 	</ComboBox>
 
 	<!-- Número de Teléfono -->
-	<Label text="Número de Teléfono:" GridPane.columnIndex="0" GridPane.rowIndex="4"/>
+	<Label text="Número de Celular:" GridPane.columnIndex="0" GridPane.rowIndex="4"/>
 	<TextField fx:id="txtTelefono" promptText="Ej: 0991234567" GridPane.columnIndex="1" GridPane.rowIndex="4"/>
 
 	<!-- Dirección -->
