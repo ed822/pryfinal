@@ -6,7 +6,7 @@ public class OrdenMedica {
 	// Variables
 	private String numero;
 	private String fecha;
-	private String cedula;
+	private long cedula;
 	private String nombre;
 	private String veterinario;
 	private String dosis;
@@ -14,8 +14,11 @@ public class OrdenMedica {
 	private String duracion;
 	private String notas;
 
+	// Constructor para Jackson
+	public OrdenMedica() {}
+
 	// Constructor
-	public OrdenMedica(String numero, String fecha, String cedula, String nombre,
+	public OrdenMedica(String numero, String fecha, long cedula, String nombre,
 			String veterinario, String dosis, String intrucciones, String duracion, String notas) {
 		this.numero = numero;
 		this.fecha = fecha;
@@ -31,7 +34,7 @@ public class OrdenMedica {
 	// Setters
 	public void setNumero(String numero) { this.numero = numero; }
 	public void setFecha(String fecha) { this.fecha = fecha; }
-	public void setCedula(String cedula) { this.cedula = cedula; }
+	public void setCedula(long cedula) { this.cedula = cedula; }
 	public void setNombre(String nombre) { this.nombre = nombre; }
 	public void setVeterinario(String veterinario) { this.veterinario = veterinario; }
 	public void setDosis(String dosis) { this.dosis = dosis; }
@@ -42,7 +45,7 @@ public class OrdenMedica {
 	// Getters
 	public String getNumero() { return this.numero; }
 	public String getFecha() { return this.fecha; }
-	public String getCedula() { return this.cedula; }
+	public long getCedula() { return this.cedula; }
 	public String getNombre() { return this.nombre; }
 	public String getVeterinario() { return this.veterinario; }
 	public String getDosis() { return this.dosis; }

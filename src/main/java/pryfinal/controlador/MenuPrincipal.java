@@ -1,22 +1,33 @@
 // Paquete
 package pryfinal.controlador;
 
-// Importaciones
+// Imports JavaFX
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.stage.Modality; // Importación para ventanas modales
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Alert;
 
-import java.io.IOException;
-import java.util.Objects;
+// Imports para JSON (Jackson)
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
+// Imports para archivos, listas
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
+
+// Modelos
 import pryfinal.modelo.Usuario;
+import pryfinal.modelo.Persona; // Para verificar existencia de veterinarios
 
 // Clase MenuPrincipal
 public class MenuPrincipal {
@@ -42,6 +53,11 @@ public class MenuPrincipal {
 	private final String TIPO_USUARIO_ADMIN = "admin";
 	private final String TIPO_USUARIO_VETERINARIO = "veterinario";
 	private final String TIPO_USUARIO_VENDEDOR = "vendedor";
+
+	// Para leer personas.json y verificar veterinarios
+	private ObjectMapper objectMapper = new ObjectMapper(); 
+	private final String RUTA_PERSONAS_JSON = "data/personas.json";
+
 
 	@FXML
 	public void initialize() {
@@ -111,18 +127,64 @@ public class MenuPrincipal {
 		if (btnIrARegistroOrdenMedica != null) btnIrARegistroOrdenMedica.setDisable(true);
 	}
 
-	private void cargarVistaModal(String fxmlFile, String title, boolean necesitaUsuario) {
+	private List<Persona> cargarPersonasDesdeJson() {
+		File archivoPersonas = new File(RUTA_PERSONAS_JSON);
+		if (archivoPersonas.exists() && archivoPersonas.length() > 0) {
+			try {
+				return objectMapper.readValue(archivoPersonas, new TypeReference<List<Persona>>() {});
+			} catch (IOException e) {
+				System.err.println("Error al cargar personas desde JSON en MenuPrincipal: " + e.getMessage());
+			}
+		}
+		return new ArrayList<>();
+	}
+
+	private boolean existenVeterinariosRegistrados() {
+		List<Persona> personas = cargarPersonasDesdeJson();
+		return personas.stream().anyMatch(p -> "Veterinario".equalsIgnoreCase(p.getTipo()));
+	}
+
+	private void cargarVistaModal(String fxmlFile, String title, boolean necesitaUsuario, String tipoVista) {
+		// Verificación específica para RegistroHistoriaClinica y RegistroOrdenMedica
+		if ("RegistroHistoriaClinica".equals(tipoVista) || "RegistroOrdenMedica".equals(tipoVista)) {
+			if (!existenVeterinariosRegistrados()) {
+				Alert alert = new Alert(Alert.AlertType.ERROR);
+				alert.setTitle("Operación no permitida");
+				alert.setHeaderText(null);
+
+				String mensajeErrorVets;
+				String tipoDeRegistro = "";
+				if ("RegistroHistoriaClinica".equals(tipoVista)) {
+					tipoDeRegistro = "entrada de historia clínica";
+				} else if ("RegistroOrdenMedica".equals(tipoVista)) {
+					tipoDeRegistro = "orden médica";
+				}
+
+				if (usuarioActual != null && TIPO_USUARIO_ADMIN.equals(usuarioActual.getTipo())) {
+					mensajeErrorVets = "No hay veterinarios registrados en el sistema. Por favor, agregue veterinarios para poder crear una nueva " + tipoDeRegistro + ".";
+				} else {
+					mensajeErrorVets = "No hay veterinarios registrados en el sistema. Por favor, pida al administrador que agregue veterinarios para poder crear una nueva " + tipoDeRegistro + ".";
+				}
+				alert.setContentText(mensajeErrorVets);
+				alert.showAndWait();
+				return; // No abrir la ventana
+			}
+		}
+
 		try {
 			FXMLLoader loader = new FXMLLoader(getClass().getResource("/pryfinal/vista/" + fxmlFile));
 			Parent root = loader.load();
 
-			// Si la vista necesita el usuario actual (ej: RegistroPersona)
 			if (necesitaUsuario) {
 				Object controladorCargado = loader.getController();
 				if (controladorCargado instanceof RegistroPersona) {
 					((RegistroPersona) controladorCargado).configurarConUsuario(this.usuarioActual);
 				}
 				// Podrías añadir más 'else if' para otros controladores que necesiten el usuario
+				// Ejemplo:
+				// else if (controladorCargado instanceof AlgunOtroControladorConUsuario) {
+				//     ((AlgunOtroControladorConUsuario) controladorCargado).setUsuarioActual(this.usuarioActual);
+				// }
 			}
 
 			Stage nuevaVentana = new Stage();
@@ -150,15 +212,16 @@ public class MenuPrincipal {
 	}
 
 	// Los métodos de acción ahora llaman a cargarVistaModal
-	@FXML private void irAConsultaMascota(ActionEvent event) { cargarVistaModal("ConsultaMascota.fxml", "Consultar Mascotas", false); }
-	@FXML private void irAConsultaPersona(ActionEvent event) { cargarVistaModal("ConsultaPersona.fxml", "Consultar Personas", false); }
-	@FXML private void irAConsultaFactura(ActionEvent event) { cargarVistaModal("ConsultaFactura.fxml", "Consultar Facturas", false); }
-	@FXML private void irAConsultaHistoriaClinica(ActionEvent event) { cargarVistaModal("ConsultaHistoriaClinica.fxml", "Consultar Historias Clínicas", false); }
-	@FXML private void irAConsultaOrdenMedica(ActionEvent event) { cargarVistaModal("ConsultaOrdenMedica.fxml", "Consultar Órdenes Médicas", false); }
+	// Pasamos 'null' para tipoVista si no requiere la verificación de veterinarios
+	@FXML private void irAConsultaMascota(ActionEvent event) { cargarVistaModal("ConsultaMascota.fxml", "Consultar Mascotas", false, null); }
+	@FXML private void irAConsultaPersona(ActionEvent event) { cargarVistaModal("ConsultaPersona.fxml", "Consultar Personas", false, null); }
+	@FXML private void irAConsultaFactura(ActionEvent event) { cargarVistaModal("ConsultaFactura.fxml", "Consultar Facturas", false, null); }
+	@FXML private void irAConsultaHistoriaClinica(ActionEvent event) { cargarVistaModal("ConsultaHistoriaClinica.fxml", "Consultar Historias Clínicas", false, null); }
+	@FXML private void irAConsultaOrdenMedica(ActionEvent event) { cargarVistaModal("ConsultaOrdenMedica.fxml", "Consultar Órdenes Médicas", false, null); }
 
-	@FXML private void irARegistroMascota(ActionEvent event) { cargarVistaModal("RegistroMascota.fxml", "Registrar Nueva Mascota", false); }
-	@FXML private void irARegistroPersona(ActionEvent event) { cargarVistaModal("RegistroPersona.fxml", "Registrar Nueva Persona", true); } // true aquí
-	@FXML private void irARegistroFactura(ActionEvent event) { cargarVistaModal("RegistroFactura.fxml", "Registrar Nueva Factura", false); }
-	@FXML private void irARegistroHistoriaClinica(ActionEvent event) { cargarVistaModal("RegistroHistoriaClinica.fxml", "Registrar Entrada de Historia Clínica", false); }
-	@FXML private void irARegistroOrdenMedica(ActionEvent event) { cargarVistaModal("RegistroOrdenMedica.fxml", "Registrar Nueva Orden Médica", false); }
-}
+	@FXML private void irARegistroMascota(ActionEvent event) { cargarVistaModal("RegistroMascota.fxml", "Registrar Nueva Mascota", false, null); }
+	@FXML private void irARegistroPersona(ActionEvent event) { cargarVistaModal("RegistroPersona.fxml", "Registrar Nueva Persona", true, "RegistroPersona"); }
+	@FXML private void irARegistroFactura(ActionEvent event) { cargarVistaModal("RegistroFactura.fxml", "Registrar Nueva Factura", false, null); }
+	@FXML private void irARegistroHistoriaClinica(ActionEvent event) { cargarVistaModal("RegistroHistoriaClinica.fxml", "Registrar Entrada de Historia Clínica", false, "RegistroHistoriaClinica"); }
+	@FXML private void irARegistroOrdenMedica(ActionEvent event) { cargarVistaModal("RegistroOrdenMedica.fxml", "Registrar Nueva Orden Médica", false, "RegistroOrdenMedica"); }
+	}
