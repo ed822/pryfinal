@@ -1,25 +1,18 @@
 // Paquete
 package pryfinal.controlador;
 
-// Imports JavaFX
+// Imports
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.DatePicker;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.util.StringConverter;
-
-// Imports para JSON (Jackson)
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-
-// Imports para archivos, listas, fecha y formato
+import pryfinal.modelo.OrdenMedica;
+import pryfinal.modelo.Persona;
 import java.io.File;
 import java.io.IOException;
 import java.time.LocalDate;
@@ -30,17 +23,14 @@ import java.util.List;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-// Modelos
-import pryfinal.modelo.OrdenMedica;
-import pryfinal.modelo.Persona; // Para cargar veterinarios
-
 // Clase RegistroOrdenMedica
 public class RegistroOrdenMedica {
-
+	// Variables
+	/// FXML
 	@FXML private TextField txtNumeroOrden;
 	@FXML private DatePicker dateFechaEmisionOrden;
 	@FXML private TextField txtCedulaDuenoOrden;
-	@FXML private TextField txtNombreMascotaOrden; // Cambiado para consistencia, antes txtIdNombreMascotaOrden
+	@FXML private TextField txtNombreMascotaOrden;
 	@FXML private ComboBox<String> cmbVeterinarioPrescribe;
 	@FXML private TextArea areaMedicamentosDosis;
 	@FXML private TextArea areaInstruccionesAdmin;
@@ -48,19 +38,19 @@ public class RegistroOrdenMedica {
 	@FXML private TextArea areaNotasAdicionalesOrden;
 	@FXML private Button btnRegistrarOrdenMedica;
 
+	/// Patrones
+	private final Pattern PATRON_NUMERO_ORDEN = Pattern.compile("^[a-zA-Z0-9-]{4,12}$");
+	private final Pattern PATRON_NOMBRE_MASCOTA = Pattern.compile("^[\\p{L}0-9 .'-]+$");
+	private final DateTimeFormatter FORMATO_FECHA = DateTimeFormatter.ISO_LOCAL_DATE;
+
+	/// Otros
 	private ObjectMapper objectMapper;
 	private final String RUTA_ORDENES_JSON = "data/ordenes_medicas.json";
 	private final String RUTA_PERSONAS_JSON = "data/personas.json";
 	private final String RUTA_DIRECTORIO_DATOS = "data";
-
-	// Patrones
-	private final Pattern PATRON_NUMERO_ORDEN = Pattern.compile("^[a-zA-Z0-9-]{4,12}$");
-	private final Pattern PATRON_NOMBRE_MASCOTA = Pattern.compile("^[\\p{L}0-9 .'-]+$");
-	private final DateTimeFormatter FORMATO_FECHA = DateTimeFormatter.ISO_LOCAL_DATE; // YYYY-MM-DD
-
 	private ObservableList<String> listaNombresVeterinarios = FXCollections.observableArrayList();
 
-
+	// Incializar
 	@FXML
 	public void initialize() {
 		objectMapper = new ObjectMapper();
@@ -75,6 +65,7 @@ public class RegistroOrdenMedica {
 		cargarVeterinariosEnComboBox();
 	}
 
+	// Configurar date picker
 	private void configurarDatePicker() {
 		dateFechaEmisionOrden.setValue(LocalDate.now());
 		dateFechaEmisionOrden.setConverter(new StringConverter<LocalDate>() {
@@ -88,6 +79,7 @@ public class RegistroOrdenMedica {
 		});
 	}
 
+	// Cargar en combo box
 	private void cargarVeterinariosEnComboBox() {
 		listaNombresVeterinarios.clear();
 		File archivoPersonas = new File(RUTA_PERSONAS_JSON);
@@ -117,6 +109,7 @@ public class RegistroOrdenMedica {
 		}
 	}
 
+	// Boton registrar
 	@FXML
 	private void handleRegistrarOrdenMedica(ActionEvent event) {
 		if (listaNombresVeterinarios.isEmpty()) {
@@ -138,14 +131,14 @@ public class RegistroOrdenMedica {
 		String dosis = areaMedicamentosDosis.getText().trim();
 		String instrucciones = areaInstruccionesAdmin.getText().trim();
 		String duracion = txtDuracionTratamiento.getText().trim();
-		String notas = areaNotasAdicionalesOrden.getText().trim(); // Puede ser vacío
+		String notas = areaNotasAdicionalesOrden.getText().trim();
 
 		OrdenMedica nuevaOrden = new OrdenMedica(numeroOrden, fechaEmision, cedulaDueno, nombreMascota,
 				veterinario, dosis, instrucciones, duracion, notas);
 
 		List<OrdenMedica> ordenes = cargarOrdenesMedicas();
 
-		// Opcional: Verificar si ya existe una orden con el mismo número
+		// Verificar si ya existe una orden con el mismo número
 		boolean ordenYaExiste = ordenes.stream().anyMatch(o -> o.getNumero().equalsIgnoreCase(numeroOrden));
 		if (ordenYaExiste) {
 			mostrarAlertaError("Registro Duplicado", "Ya existe una orden médica registrada con el número: " + numeroOrden);
@@ -162,6 +155,7 @@ public class RegistroOrdenMedica {
 		}
 	}
 
+	// Validacion
 	private List<String> validarCampos() {
 		List<String> errores = new ArrayList<>();
 
@@ -230,11 +224,11 @@ public class RegistroOrdenMedica {
 		String duracion = txtDuracionTratamiento.getText().trim();
 		if (duracion.isEmpty()) {
 			errores.add("- Duración del tratamiento no puede estar vacío.");
-		} else if (duracion.length() < 3 || duracion.length() > 975) { // Longitud generosa
+		} else if (duracion.length() < 3 || duracion.length() > 975) {
 			errores.add("- Duración del tratamiento debe tener entre 3 y 975 caracteres.");
 		}
 
-		// Notas Adicionales (Opcional, solo validar longitud si se ingresa algo)
+		// Notas Adicionales (opcional)
 		String notas = areaNotasAdicionalesOrden.getText().trim();
 		if (!notas.isEmpty() && notas.length() > 975) {
 			errores.add("- Notas adicionales no debe exceder los 975 caracteres.");
@@ -243,6 +237,7 @@ public class RegistroOrdenMedica {
 		return errores;
 	}
 
+	// Cargar
 	private List<OrdenMedica> cargarOrdenesMedicas() {
 		File archivo = new File(RUTA_ORDENES_JSON);
 		if (archivo.exists() && archivo.length() > 0) {
@@ -253,6 +248,7 @@ public class RegistroOrdenMedica {
 		return new ArrayList<>();
 	}
 
+	// Guardar
 	private boolean guardarOrdenesMedicas(List<OrdenMedica> ordenes) {
 		try {
 			objectMapper.writeValue(new File(RUTA_ORDENES_JSON), ordenes);
@@ -260,6 +256,7 @@ public class RegistroOrdenMedica {
 		} catch (IOException e) { System.err.println("Error al guardar órdenes médicas: " + e.getMessage()); return false; }
 	}
 
+	// Limpiar campos
 	private void limpiarCampos() {
 		txtNumeroOrden.clear();
 		dateFechaEmisionOrden.setValue(LocalDate.now());
@@ -275,6 +272,8 @@ public class RegistroOrdenMedica {
 		txtNumeroOrden.requestFocus();
 	}
 
+	// Mostrar alerta
+	/// Validacion
 	private void mostrarAlertaValidacion(String titulo, List<String> mensajes) {
 		Alert alert = new Alert(Alert.AlertType.WARNING);
 		alert.setTitle(titulo);
@@ -283,6 +282,7 @@ public class RegistroOrdenMedica {
 		alert.showAndWait();
 	}
 
+	/// Infomacion
 	private void mostrarAlertaInformacion(String titulo, String mensaje) {
 		Alert alert = new Alert(Alert.AlertType.INFORMATION);
 		alert.setTitle(titulo);
@@ -291,6 +291,7 @@ public class RegistroOrdenMedica {
 		alert.showAndWait();
 	}
 
+	/// Error
 	private void mostrarAlertaError(String titulo, String mensaje) {
 		Alert alert = new Alert(Alert.AlertType.ERROR);
 		alert.setTitle(titulo);

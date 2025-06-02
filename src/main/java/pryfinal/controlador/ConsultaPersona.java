@@ -1,41 +1,30 @@
 // Paquete
 package pryfinal.controlador;
 
-// Imports JavaFX
+// Imports
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
-
-// Imports para JSON (Jackson)
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-// Imports para archivos y listas
+import pryfinal.modelo.Persona;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
-
-// Modelo
-import pryfinal.modelo.Persona;
 
 // Clase ConsultaPersona
 public class ConsultaPersona {
-
+	// Variables
+	/// FXML
 	@FXML private TextField txtBuscarPersona;
 	@FXML private Button btnBuscarPersona;
 	@FXML private Button btnRefrescarPersonas;
 	@FXML private TableView<Persona> tablaPersonas;
-
 	@FXML private TableColumn<Persona, Long> colCedulaPersona;
 	@FXML private TableColumn<Persona, String> colNombrePersona;
 	@FXML private TableColumn<Persona, String> colApellidoPersona;
@@ -44,11 +33,12 @@ public class ConsultaPersona {
 	@FXML private TableColumn<Persona, String> colDireccionPersona;
 	@FXML private TableColumn<Persona, String> colEmailPersona;
 
+	/// Otros
 	private ObjectMapper objectMapper;
 	private final String RUTA_PERSONAS_JSON = "data/personas.json";
-
 	private ObservableList<Persona> listaObservablePersonas = FXCollections.observableArrayList();
 
+	// Incializar
 	@FXML
 	public void initialize() {
 		objectMapper = new ObjectMapper();
@@ -57,6 +47,7 @@ public class ConsultaPersona {
 		configurarFiltroBusqueda();
 	}
 
+	// Columnas
 	private void configurarColumnasTabla() {
 		colCedulaPersona.setCellValueFactory(new PropertyValueFactory<>("cedula"));
 		colNombrePersona.setCellValueFactory(new PropertyValueFactory<>("nombre"));
@@ -67,6 +58,7 @@ public class ConsultaPersona {
 		colEmailPersona.setCellValueFactory(new PropertyValueFactory<>("email"));
 	}
 
+	// Cargar
 	private void cargarYMostrarPersonas() {
 		listaObservablePersonas.clear();
 		File archivo = new File(RUTA_PERSONAS_JSON);
@@ -83,6 +75,7 @@ public class ConsultaPersona {
 		}
 	}
 
+	// Filtro
 	private void configurarFiltroBusqueda() {
 		FilteredList<Persona> personasFiltradas = new FilteredList<>(listaObservablePersonas, p -> true);
 
@@ -93,7 +86,7 @@ public class ConsultaPersona {
 				}
 				String textoBusquedaLower = newValue.toLowerCase();
 
-				// Buscar por cédula, nombre o apellido
+				// Buscar por cedula, nombre o apellido
 				if (String.valueOf(persona.getCedula()).contains(textoBusquedaLower)) {
 					return true;
 				} else if (persona.getNombre().toLowerCase().contains(textoBusquedaLower)) {
@@ -112,11 +105,11 @@ public class ConsultaPersona {
 		tablaPersonas.setItems(personasOrdenadas);
 	}
 
+	// Buscar
 	@FXML
-	private void handleBuscarPersona(ActionEvent event) {
-		txtBuscarPersona.requestFocus();
-	}
+	private void handleBuscarPersona(ActionEvent event) { txtBuscarPersona.requestFocus(); }
 
+	// Refrescar
 	@FXML
 	private void handleRefrescarPersonas(ActionEvent event) {
 		txtBuscarPersona.clear();
@@ -124,6 +117,8 @@ public class ConsultaPersona {
 		mostrarAlertaInformacion("Datos Actualizados", "La lista de personas ha sido refrescada.");
 	}
 
+	// Mostrar alerta
+	/// Infomacion
 	private void mostrarAlertaInformacion(String titulo, String mensaje) {
 		Alert alert = new Alert(Alert.AlertType.INFORMATION);
 		alert.setTitle(titulo);
@@ -132,6 +127,7 @@ public class ConsultaPersona {
 		alert.showAndWait();
 	}
 
+	/// Error
 	private void mostrarAlertaError(String titulo, String mensaje) {
 		Alert alert = new Alert(Alert.AlertType.ERROR);
 		alert.setTitle(titulo);

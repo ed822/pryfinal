@@ -1,79 +1,70 @@
 // Paquete
 package pryfinal.controlador;
 
-// Imports JavaFX
+// Imports
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.DatePicker;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.util.StringConverter;
-
-// Imports para JSON (Jackson)
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-// Imports para archivos, listas y fecha
+import pryfinal.modelo.Factura;
 import java.io.File;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Predicate; // Para combinar predicados de filtro
-
-// Modelo
-import pryfinal.modelo.Factura;
+import java.util.function.Predicate;
 
 // Clase ConsultaFactura
 public class ConsultaFactura {
-
+	// Variables
+	/// FXML
 	@FXML private TextField txtBuscarFactura;
 	@FXML private DatePicker dateDesdeFactura;
 	@FXML private DatePicker dateHastaFactura;
-	@FXML private Button btnBuscarFactura; // Ahora será más relevante para aplicar filtros combinados
+	@FXML private Button btnBuscarFactura;
 	@FXML private Button btnRefrescarFacturas;
 	@FXML private TableView<Factura> tablaFacturas;
 
-	// Columnas
+	//// Columnas
 	@FXML private TableColumn<Factura, String> colNumeroFactura;
 	@FXML private TableColumn<Factura, String> colFechaEmisionFactura;
 	@FXML private TableColumn<Factura, Long> colCedulaClienteFactura;
 	@FXML private TableColumn<Factura, String> colNombreClienteFactura;
-	@FXML private TableColumn<Factura, String> colDescripcionFactura; // Breve
+	@FXML private TableColumn<Factura, String> colDescripcionFactura;
 	@FXML private TableColumn<Factura, Double> colSubtotalFactura;
 	@FXML private TableColumn<Factura, Integer> colIVAFactura;
 	@FXML private TableColumn<Factura, Double> colTotalFactura;
 	@FXML private TableColumn<Factura, String> colMetodoPagoFactura;
 
+	/// Otros
 	private ObjectMapper objectMapper;
 	private final String RUTA_FACTURAS_JSON = "data/facturas.json";
-	private final DateTimeFormatter FORMATO_FECHA_TABLA = DateTimeFormatter.ISO_LOCAL_DATE; // YYYY-MM-DD
-
+	private final DateTimeFormatter FORMATO_FECHA_TABLA = DateTimeFormatter.ISO_LOCAL_DATE;
 	private ObservableList<Factura> listaObservableFacturas = FXCollections.observableArrayList();
 	private FilteredList<Factura> facturasFiltradas;
 
+	// Incializar
 	@FXML
 	public void initialize() {
 		objectMapper = new ObjectMapper();
 		configurarColumnasTabla();
 		configurarDatePickers();
-		cargarYMostrarFacturas(); // Carga inicial
-		configurarFiltroDinamico(); // Configura el filtro para la tabla
+		cargarYMostrarFacturas();
+		configurarFiltroDinamico();
 	}
 
+	// Configurar columnas tabla
 	private void configurarColumnasTabla() {
 		colNumeroFactura.setCellValueFactory(new PropertyValueFactory<>("factura"));
-		colFechaEmisionFactura.setCellValueFactory(new PropertyValueFactory<>("fecha")); // Se mostrará como String
+		colFechaEmisionFactura.setCellValueFactory(new PropertyValueFactory<>("fecha"));
 		colCedulaClienteFactura.setCellValueFactory(new PropertyValueFactory<>("cedula"));
 		colNombreClienteFactura.setCellValueFactory(new PropertyValueFactory<>("nombre"));
 		colDescripcionFactura.setCellValueFactory(new PropertyValueFactory<>("descripcion"));
@@ -83,6 +74,7 @@ public class ConsultaFactura {
 		colMetodoPagoFactura.setCellValueFactory(new PropertyValueFactory<>("metodo"));
 	}
 
+	// Configurar date pickers
 	private void configurarDatePickers() {
 		StringConverter<LocalDate> converter = new StringConverter<LocalDate>() {
 			@Override
@@ -96,13 +88,9 @@ public class ConsultaFactura {
 		};
 		dateDesdeFactura.setConverter(converter);
 		dateHastaFactura.setConverter(converter);
-
-		// Listeners para aplicar filtro cuando cambian las fechas
-		// dateDesdeFactura.valueProperty().addListener((obs, old,_new) -> aplicarFiltros());
-		// dateHastaFactura.valueProperty().addListener((obs, old,_new) -> aplicarFiltros());
-		// El botón "Buscar/Filtrar" será el principal para aplicar filtros combinados.
 	}
 
+	// Cargar y mostrar
 	private void cargarYMostrarFacturas() {
 		listaObservableFacturas.clear();
 		File archivo = new File(RUTA_FACTURAS_JSON);
@@ -117,48 +105,39 @@ public class ConsultaFactura {
 		} else {
 			System.out.println("Archivo facturas.json no encontrado o vacío.");
 		}
-		// La lista filtrada se actualizará automáticamente si ya está configurada.
-		// Si es la primera carga, configurarFiltroDinamico() se encargará.
 	}
 
+	// Filtro dinamico
 	private void configurarFiltroDinamico() {
-		facturasFiltradas = new FilteredList<>(listaObservableFacturas, p -> true); // Mostrar todo inicialmente
+		facturasFiltradas = new FilteredList<>(listaObservableFacturas, p -> true);
 
-		// El listener del TextField se aplica en tiempo real
+		// Listener del TextField (se aplica en tiempo real)
 		txtBuscarFactura.textProperty().addListener((observable, oldValue, newValue) -> aplicarFiltros());
-		// Las fechas se aplicarán con el botón "Buscar/Filtrar" para evitar múltiples actualizaciones
-		// o se pueden añadir listeners aquí si se prefiere el comportamiento en tiempo real para fechas también.
-
 		SortedList<Factura> facturasOrdenadas = new SortedList<>(facturasFiltradas);
 		facturasOrdenadas.comparatorProperty().bind(tablaFacturas.comparatorProperty());
 		tablaFacturas.setItems(facturasOrdenadas);
 	}
 
+	// Boton Buscar Factura
 	@FXML
-	private void handleBuscarFactura(ActionEvent event) {
-		// Este botón ahora es el principal para aplicar todos los filtros combinados
-		aplicarFiltros();
-	}
+	private void handleBuscarFactura(ActionEvent event) { aplicarFiltros(); }
 
+	// Aplicar todos los filtros
 	private void aplicarFiltros() {
 		String textoBusqueda = txtBuscarFactura.getText().toLowerCase().trim();
 		LocalDate fechaDesde = dateDesdeFactura.getValue();
 		LocalDate fechaHasta = dateHastaFactura.getValue();
 
-		// Crear predicados para cada filtro
+		// Predicados (Predicate) para cada filtro
 		Predicate<Factura> predicadoTexto = factura -> {
-			if (textoBusqueda.isEmpty()) {
-				return true;
-			}
+			if (textoBusqueda.isEmpty()) { return true; }
 			return factura.getFactura().toLowerCase().contains(textoBusqueda) ||
 				String.valueOf(factura.getCedula()).contains(textoBusqueda) ||
 				factura.getNombre().toLowerCase().contains(textoBusqueda);
 		};
 
 		Predicate<Factura> predicadoFechaDesde = factura -> {
-			if (fechaDesde == null) {
-				return true;
-			}
+			if (fechaDesde == null) { return true; }
 			try {
 				LocalDate fechaFactura = LocalDate.parse(factura.getFecha(), FORMATO_FECHA_TABLA);
 				return !fechaFactura.isBefore(fechaDesde);
@@ -166,9 +145,7 @@ public class ConsultaFactura {
 		};
 
 		Predicate<Factura> predicadoFechaHasta = factura -> {
-			if (fechaHasta == null) {
-				return true;
-			}
+			if (fechaHasta == null) { return true; }
 			try {
 				LocalDate fechaFactura = LocalDate.parse(factura.getFecha(), FORMATO_FECHA_TABLA);
 				return !fechaFactura.isAfter(fechaHasta);
@@ -180,16 +157,19 @@ public class ConsultaFactura {
 	}
 
 
+	// Boton refrescar facturas
 	@FXML
 	private void handleRefrescarFacturas(ActionEvent event) {
 		txtBuscarFactura.clear();
 		dateDesdeFactura.setValue(null);
 		dateHastaFactura.setValue(null);
-		cargarYMostrarFacturas(); // Recargar los datos originales
-		aplicarFiltros(); // Aplicar filtros (que ahora serán vacíos, mostrando todo)
+		cargarYMostrarFacturas();
+		aplicarFiltros();
 		mostrarAlertaInformacion("Datos Actualizados", "La lista de facturas ha sido refrescada.");
 	}
 
+	// Mostrar alerta
+	/// Infomacion
 	private void mostrarAlertaInformacion(String titulo, String mensaje) {
 		Alert alert = new Alert(Alert.AlertType.INFORMATION);
 		alert.setTitle(titulo);
@@ -198,6 +178,7 @@ public class ConsultaFactura {
 		alert.showAndWait();
 	}
 
+	/// Error
 	private void mostrarAlertaError(String titulo, String mensaje) {
 		Alert alert = new Alert(Alert.AlertType.ERROR);
 		alert.setTitle(titulo);

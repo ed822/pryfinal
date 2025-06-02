@@ -1,25 +1,18 @@
 // Paquete
 package pryfinal.controlador;
 
-// Imports JavaFX
+// Imports
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.DatePicker;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.util.StringConverter;
-
-// Imports para JSON (Jackson)
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-
-// Imports para archivos, listas, fecha y formato
+import pryfinal.modelo.HistoriaClinica;
+import pryfinal.modelo.Persona;
 import java.io.File;
 import java.io.IOException;
 import java.time.LocalDate;
@@ -30,13 +23,10 @@ import java.util.List;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-// Modelos
-import pryfinal.modelo.HistoriaClinica;
-import pryfinal.modelo.Persona; // Necesario para cargar los veterinarios
-
 // Clase RegistroHistoriaClinica
 public class RegistroHistoriaClinica {
-
+	// Variables
+	/// FXML
 	@FXML private TextField txtCedulaDuenoHC;
 	@FXML private TextField txtNombreMascotaHC;
 	@FXML private DatePicker dateFechaVisitaHC;
@@ -47,17 +37,18 @@ public class RegistroHistoriaClinica {
 	@FXML private TextArea areaObservacionesHC;
 	@FXML private Button btnRegistrarHistoria;
 
+	// Patrones
+	private final Pattern PATRON_NOMBRE_MASCOTA = Pattern.compile("^[\\p{L}0-9 .'-]+$");
+	private final DateTimeFormatter FORMATO_FECHA = DateTimeFormatter.ISO_LOCAL_DATE;
+
+	/// Otros
 	private ObjectMapper objectMapper;
 	private final String RUTA_HISTORIAS_JSON = "data/historias_clinicas.json";
-	private final String RUTA_PERSONAS_JSON = "data/personas.json"; // Para cargar veterinarios
+	private final String RUTA_PERSONAS_JSON = "data/personas.json";
 	private final String RUTA_DIRECTORIO_DATOS = "data";
-
-	// Patrones de validación
-	private final Pattern PATRON_NOMBRE_MASCOTA = Pattern.compile("^[\\p{L}0-9 .'-]+$"); // Permite números también para IDs de mascota
-	private final DateTimeFormatter FORMATO_FECHA = DateTimeFormatter.ISO_LOCAL_DATE; // YYYY-MM-DD
-
 	private ObservableList<String> listaNombresVeterinarios = FXCollections.observableArrayList();
 
+	// Incializar
 	@FXML
 	public void initialize() {
 		objectMapper = new ObjectMapper();
@@ -72,8 +63,9 @@ public class RegistroHistoriaClinica {
 		cargarVeterinariosEnComboBox();
 	}
 
+	// Date picker
 	private void configurarDatePicker() {
-		dateFechaVisitaHC.setValue(LocalDate.now()); // Fecha actual por defecto
+		dateFechaVisitaHC.setValue(LocalDate.now());
 		dateFechaVisitaHC.setConverter(new StringConverter<LocalDate>() {
 			@Override
 			public String toString(LocalDate date) {
@@ -95,6 +87,7 @@ public class RegistroHistoriaClinica {
 		});
 	}
 
+	// Cargar
 	private void cargarVeterinariosEnComboBox() {
 		listaNombresVeterinarios.clear();
 		File archivoPersonas = new File(RUTA_PERSONAS_JSON);
@@ -103,7 +96,7 @@ public class RegistroHistoriaClinica {
 				List<Persona> todasLasPersonas = objectMapper.readValue(archivoPersonas, new TypeReference<List<Persona>>() {});
 				List<String> veterinarios = todasLasPersonas.stream()
 					.filter(p -> "Veterinario".equalsIgnoreCase(p.getTipo()))
-					.map(p -> p.getNombre() + " " + p.getApellido()) // Nombre completo
+					.map(p -> p.getNombre() + " " + p.getApellido())
 					.collect(Collectors.toList());
 
 				listaNombresVeterinarios.addAll(veterinarios);
@@ -118,7 +111,6 @@ public class RegistroHistoriaClinica {
 		if (listaNombresVeterinarios.isEmpty()) {
 			cmbVeterinarioEncargado.setDisable(true);
 			cmbVeterinarioEncargado.setPromptText("No hay veterinarios registrados");
-			// El botón de registrar se deshabilitará o la validación fallará si esto ocurre.
 		} else if (listaNombresVeterinarios.size() == 1) {
 			cmbVeterinarioEncargado.getSelectionModel().selectFirst();
 			cmbVeterinarioEncargado.setDisable(true);
@@ -129,9 +121,10 @@ public class RegistroHistoriaClinica {
 	}
 
 
+	// Registrar
 	@FXML
 	private void handleRegistrarHistoria(ActionEvent event) {
-		// Verificar si hay veterinarios antes de intentar validar y registrar
+		// Verificar si hay veterinarios
 		if (listaNombresVeterinarios.isEmpty()) {
 			mostrarAlertaError("Operación no permitida", "No hay veterinarios registrados en el sistema. Por favor, pida al administrador que agregue veterinarios para poder registrar una historia clínica.");
 			return;
@@ -147,7 +140,7 @@ public class RegistroHistoriaClinica {
 		long cedulaDueno = Long.parseLong(txtCedulaDuenoHC.getText().trim());
 		String nombreMascota = txtNombreMascotaHC.getText().trim();
 		String fechaVisita = FORMATO_FECHA.format(dateFechaVisitaHC.getValue());
-		String veterinarioEncargado = cmbVeterinarioEncargado.getValue(); // Ya validado que no es null
+		String veterinarioEncargado = cmbVeterinarioEncargado.getValue();
 		String motivo = areaMotivoConsulta.getText().trim();
 		String diagnostico = areaDiagnostico.getText().trim();
 		String tratamiento = areaTratamientoIndicado.getText().trim();
@@ -167,6 +160,7 @@ public class RegistroHistoriaClinica {
 		}
 	}
 
+	// Validacion
 	private List<String> validarCampos() {
 		List<String> errores = new ArrayList<>();
 
@@ -234,12 +228,11 @@ public class RegistroHistoriaClinica {
 			errores.add("- Tratamiento indicado debe tener entre 3 y 975 caracteres.");
 		}
 
-		// Observaciones (puede ser opcional, si es así, quitar la validación de isEmpty)
+		// Observaciones (opcional)
 		String observaciones = areaObservacionesHC.getText().trim();
 		if (observaciones.isEmpty()) {
-			// Si es opcional, comentar la siguiente línea
-			// errores.add("- Observaciones no puede estar vacío."); 
-		} else if (observaciones.length() > 0 && (observaciones.length() < 3 || observaciones.length() > 975) ) { 
+			// El campo es opcional, no se hace nada si esta vacio
+		} else if (observaciones.length() > 0 && (observaciones.length() < 3 || observaciones.length() > 975) ) {
 			// Solo validar longitud si no está vacío
 			errores.add("- Observaciones debe tener entre 3 y 975 caracteres si se ingresa.");
 		}
@@ -247,6 +240,7 @@ public class RegistroHistoriaClinica {
 		return errores;
 	}
 
+	// Cargar
 	private List<HistoriaClinica> cargarHistorias() {
 		File archivo = new File(RUTA_HISTORIAS_JSON);
 		if (archivo.exists() && archivo.length() > 0) {
@@ -259,6 +253,7 @@ public class RegistroHistoriaClinica {
 		return new ArrayList<>();
 	}
 
+	// Guardar
 	private boolean guardarHistorias(List<HistoriaClinica> historias) {
 		try {
 			objectMapper.writeValue(new File(RUTA_HISTORIAS_JSON), historias);
@@ -269,11 +264,12 @@ public class RegistroHistoriaClinica {
 		}
 	}
 
+	// Limpiar campos
 	private void limpiarCampos() {
 		txtCedulaDuenoHC.clear();
 		txtNombreMascotaHC.clear();
 		dateFechaVisitaHC.setValue(LocalDate.now());
-		if (!cmbVeterinarioEncargado.isDisabled()) { // Solo limpiar si no está deshabilitado
+		if (!cmbVeterinarioEncargado.isDisabled()) {
 			cmbVeterinarioEncargado.getSelectionModel().clearSelection();
 		}
 		areaMotivoConsulta.clear();
@@ -283,6 +279,8 @@ public class RegistroHistoriaClinica {
 		txtCedulaDuenoHC.requestFocus();
 	}
 
+	// Mostrar alerta
+	/// Validacion
 	private void mostrarAlertaValidacion(String titulo, List<String> mensajes) {
 		Alert alert = new Alert(Alert.AlertType.WARNING);
 		alert.setTitle(titulo);
@@ -291,6 +289,7 @@ public class RegistroHistoriaClinica {
 		alert.showAndWait();
 	}
 
+	/// Infomacion
 	private void mostrarAlertaInformacion(String titulo, String mensaje) {
 		Alert alert = new Alert(Alert.AlertType.INFORMATION);
 		alert.setTitle(titulo);
@@ -299,6 +298,7 @@ public class RegistroHistoriaClinica {
 		alert.showAndWait();
 	}
 
+	/// Error
 	private void mostrarAlertaError(String titulo, String mensaje) {
 		Alert alert = new Alert(Alert.AlertType.ERROR);
 		alert.setTitle(titulo);

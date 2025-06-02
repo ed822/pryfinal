@@ -1,20 +1,18 @@
 // Paquete
 package pryfinal.controlador;
 
-// Imports JavaFX
+// Imports
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
-
-// Modelo
 import pryfinal.modelo.OrdenMedica;
 
-// Clase DetalleOrdenMedica (antes DetalleOrdenMedicaController)
+// Clase DetalleOrdenMedica
 public class DetalleOrdenMedica {
-
+	// FXML
 	@FXML private TextField txtNumeroOrden;
 	@FXML private TextField txtFechaEmision;
 	@FXML private TextField txtCedulaDueno;
@@ -26,6 +24,7 @@ public class DetalleOrdenMedica {
 	@FXML private TextArea areaNotasAdicionales;
 	@FXML private Button btnCerrarDetalleOrden;
 
+	// Cargar
 	public void cargarDatos(OrdenMedica orden) {
 		if (orden != null) {
 			txtNumeroOrden.setText(orden.getNumero());
@@ -40,6 +39,7 @@ public class DetalleOrdenMedica {
 		}
 	}
 
+	// Cerrar
 	@FXML
 	private void handleCerrar(ActionEvent event) {
 		Stage stage = (Stage) btnCerrarDetalleOrden.getScene().getWindow();

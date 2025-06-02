@@ -1,20 +1,18 @@
 // Paquete
 package pryfinal.controlador;
 
-// Imports JavaFX
+// Imports
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
-
-// Modelo
 import pryfinal.modelo.HistoriaClinica;
 
-// Clase DetalleHistoriaClinica (antes DetalleHistoriaClinicaController)
+// Clase DetalleHistoriaClinica
 public class DetalleHistoriaClinica {
-
+	// FXML
 	@FXML private TextField txtCedulaDuenoHC;
 	@FXML private TextField txtNombreMascotaHC;
 	@FXML private TextField txtFechaVisitaHC;
@@ -25,6 +23,7 @@ public class DetalleHistoriaClinica {
 	@FXML private TextArea areaObservacionesHC;
 	@FXML private Button btnCerrarDetalleHistoria;
 
+	// Cargar
 	public void cargarDatos(HistoriaClinica historia) {
 		if (historia != null) {
 			txtCedulaDuenoHC.setText(String.valueOf(historia.getCedula()));
@@ -38,6 +37,7 @@ public class DetalleHistoriaClinica {
 		}
 	}
 
+	// Cerrar
 	@FXML
 	private void handleCerrar(ActionEvent event) {
 		Stage stage = (Stage) btnCerrarDetalleHistoria.getScene().getWindow();

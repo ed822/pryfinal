@@ -1,41 +1,29 @@
 // Paquete
 package pryfinal.controlador;
 
-// Imports JavaFX
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
-import javafx.event.ActionEvent;
-import javafx.fxml.FXML;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.DatePicker;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
-import javafx.util.StringConverter;
-
-// Imports para JSON (Jackson)
+// Imports
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-
-// Imports para archivos, listas, fecha y formato
+import javafx.event.ActionEvent;
+import javafx.fxml.FXML;
+import javafx.scene.control.*;
+import javafx.util.StringConverter;
+import pryfinal.modelo.Factura;
 import java.io.File;
 import java.io.IOException;
+import java.text.DecimalFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
-import java.text.DecimalFormat; // Para formatear el total
-
-// Modelo
-import pryfinal.modelo.Factura;
 
 // Clase RegistroFactura
 public class RegistroFactura {
-
+	// Variables
+	/// FXML
 	@FXML private TextField txtNumeroFactura;
 	@FXML private DatePicker dateFechaEmision;
 	@FXML private TextField txtCedulaClienteFactura;
@@ -43,21 +31,22 @@ public class RegistroFactura {
 	@FXML private TextArea areaDescripcionFactura;
 	@FXML private TextField txtSubtotalFactura;
 	@FXML private TextField txtIVAFactura;
-	@FXML private TextField txtTotalFactura; // Será deshabilitado y auto-calculado
+	@FXML private TextField txtTotalFactura;
 	@FXML private ComboBox<String> cmbMetodoPago;
 	@FXML private Button btnRegistrarFactura;
 
+	/// Patrones
+	private final Pattern PATRON_NUMERO_FACTURA = Pattern.compile("^[a-zA-Z0-9-]{4,12}$");
+	private final Pattern PATRON_NOMBRE_CLIENTE = Pattern.compile("^[\\p{L} .'-]+$");
+	private final DateTimeFormatter FORMATO_FECHA = DateTimeFormatter.ISO_LOCAL_DATE;
+	private final DecimalFormat FORMATO_MONEDA = new DecimalFormat("#,##0.00");
+
+	/// Otros
 	private ObjectMapper objectMapper;
 	private final String RUTA_FACTURAS_JSON = "data/facturas.json";
 	private final String RUTA_DIRECTORIO_DATOS = "data";
 
-	// Patrones de validación
-	private final Pattern PATRON_NUMERO_FACTURA = Pattern.compile("^[a-zA-Z0-9-]{4,12}$");
-	private final Pattern PATRON_NOMBRE_CLIENTE = Pattern.compile("^[\\p{L} .'-]+$");
-	private final DateTimeFormatter FORMATO_FECHA = DateTimeFormatter.ISO_LOCAL_DATE; // YYYY-MM-DD
-	private final DecimalFormat FORMATO_MONEDA = new DecimalFormat("#,##0.00");
-
-
+	// Inicializar
 	@FXML
 	public void initialize() {
 		objectMapper = new ObjectMapper();
@@ -71,18 +60,17 @@ public class RegistroFactura {
 		configurarDatePicker();
 		configurarCalculoTotalDinamico();
 
-		// Deshabilitar el campo Total y darle un estilo para que parezca deshabilitado
+		// Deshabilitar el campo Total
 		txtTotalFactura.setEditable(false);
 		txtTotalFactura.setFocusTraversable(false);
-		// Podrías añadir un estilo CSS para que parezca más "display-only"
-		// txtTotalFactura.setStyle("-fx-control-inner-background: #f0f0f0;"); 
 	}
 
+	// Date picker
 	private void configurarDatePicker() {
-		// Establecer la fecha actual por defecto
+		// Fecha actual por defecto
 		dateFechaEmision.setValue(LocalDate.now());
 
-		// Formateador para mostrar y parsear la fecha en el DatePicker
+		// "Formateador" para la fecha en el DatePicker
 		dateFechaEmision.setConverter(new StringConverter<LocalDate>() {
 			@Override
 			public String toString(LocalDate date) {
@@ -99,9 +87,6 @@ public class RegistroFactura {
 					try {
 						return LocalDate.parse(string, FORMATO_FECHA);
 					} catch (DateTimeParseException e) {
-						// Si el usuario escribe una fecha inválida, no la aceptamos directamente.
-						// La validación se hará al intentar registrar.
-						// Podrías limpiar el DatePicker o mostrar un error visual aquí.
 						System.err.println("Formato de fecha inválido ingresado manualmente: " + string);
 						return dateFechaEmision.getValue(); // Mantener valor anterior o null si es el primero
 					}
@@ -112,6 +97,7 @@ public class RegistroFactura {
 		});
 	}
 
+	// Total dinamico
 	private void configurarCalculoTotalDinamico() {
 		// Listener para subtotal
 		txtSubtotalFactura.textProperty().addListener((obs, oldVal, newVal) -> calcularYActualizarTotal());
@@ -119,6 +105,7 @@ public class RegistroFactura {
 		txtIVAFactura.textProperty().addListener((obs, oldVal, newVal) -> calcularYActualizarTotal());
 	}
 
+	// Actualizar total
 	private void calcularYActualizarTotal() {
 		try {
 			String subtotalStr = txtSubtotalFactura.getText().trim();
@@ -132,9 +119,9 @@ public class RegistroFactura {
 			double subtotal = Double.parseDouble(subtotalStr);
 			int ivaPorcentaje = Integer.parseInt(ivaPorcentajeStr);
 
-			// Validar que el subtotal sea positivo y el IVA esté en rango antes de calcular visualmente
+			// Validar que el subtotal sea positivo y el IVA esté en rango
 			if (subtotal < 0 || ivaPorcentaje < 0 || ivaPorcentaje > 800) {
-				txtTotalFactura.setText(""); // Valores inválidos para cálculo visual
+				txtTotalFactura.setText("");
 				return;
 			}
 
@@ -144,11 +131,11 @@ public class RegistroFactura {
 			txtTotalFactura.setText(FORMATO_MONEDA.format(totalCalculado));
 
 		} catch (NumberFormatException e) {
-			txtTotalFactura.setText(""); // Si hay error de formato, limpiar total
+			txtTotalFactura.setText("");
 		}
 	}
 
-
+	// Registar factura
 	@FXML
 	private void handleRegistrarFactura(ActionEvent event) {
 		List<String> errores = validarCampos();
@@ -168,7 +155,7 @@ public class RegistroFactura {
 		int iva = Integer.parseInt(txtIVAFactura.getText().trim());
 		String metodoPago = cmbMetodoPago.getValue();
 
-		// Recalcular el total para asegurar consistencia, aunque ya se muestre dinámicamente
+		// Calcular el total (aunque ya se muestre dinámicamente)
 		double valorIvaCalculado = subtotal * (iva / 100.0);
 		double totalFinal = subtotal + valorIvaCalculado;
 
@@ -177,7 +164,7 @@ public class RegistroFactura {
 
 		List<Factura> facturas = cargarFacturas();
 
-		// Opcional: Verificar si ya existe una factura con el mismo número
+		// Verificar si ya existe una factura con el mismo número
 		boolean facturaYaExiste = facturas.stream().anyMatch(f -> f.getFactura().equalsIgnoreCase(numeroFactura));
 		if (facturaYaExiste) {
 			mostrarAlertaError("Registro Duplicado", "Ya existe una factura registrada con el número: " + numeroFactura);
@@ -194,6 +181,7 @@ public class RegistroFactura {
 		}
 	}
 
+	// Validacion
 	private List<String> validarCampos() {
 		List<String> errores = new ArrayList<>();
 
@@ -206,19 +194,11 @@ public class RegistroFactura {
 		}
 
 		// Fecha de Emisión
-		if (dateFechaEmision.getValue() == null) {
-			errores.add("- Fecha de emisión no puede estar vacía.");
-		} else {
-			// El DatePicker con el converter ya ayuda a mantener un formato,
-			// pero validamos que no sea null (por si se limpió de alguna forma)
-			// y que el valor parseado sea una fecha real.
-			// La validación de formato es implícita por el DatePicker.
-			// Podríamos añadir una comprobación de que la fecha no sea absurda si es necesario,
-			// pero "valid date" es suficiente según el requerimiento.
-		}
-		// Una validación explícita del formato del editor del DatePicker si el usuario escribe
+		if (dateFechaEmision.getValue() == null) { errores.add("- Fecha de emisión no puede estar vacía."); }
+
+		/// Validación explícita del formato de fecha
 		String fechaEditor = dateFechaEmision.getEditor().getText();
-		if (fechaEditor.isEmpty() && dateFechaEmision.getValue() == null) { // Si está vacío y no hay valor
+		if (fechaEditor.isEmpty() && dateFechaEmision.getValue() == null) {
 			errores.add("- Fecha de emisión no puede estar vacía.");
 		} else if (!fechaEditor.isEmpty()) {
 			try {
@@ -227,7 +207,6 @@ public class RegistroFactura {
 				errores.add("- Fecha de emisión tiene un formato inválido. Use AAAA-MM-DD.");
 			}
 		}
-
 
 		// Cédula del Cliente
 		String cedulaCliente = txtCedulaClienteFactura.getText().trim();
@@ -264,7 +243,7 @@ public class RegistroFactura {
 		} else {
 			try {
 				double subtotal = Double.parseDouble(subtotalStr);
-				if (subtotal < 0) { // Permitir 0 como subtotal si es válido para el negocio
+				if (subtotal < 0) {
 					errores.add("- Subtotal debe ser un número positivo o cero.");
 				}
 			} catch (NumberFormatException e) {
@@ -287,8 +266,6 @@ public class RegistroFactura {
 			}
 		}
 
-		// Total (No se valida directamente, se calcula)
-
 		// Método de Pago
 		if (cmbMetodoPago.getValue() == null || cmbMetodoPago.getValue().isEmpty()) {
 			errores.add("- Debe seleccionar un método de pago.");
@@ -297,6 +274,7 @@ public class RegistroFactura {
 		return errores;
 	}
 
+	// Cargar
 	private List<Factura> cargarFacturas() {
 		File archivo = new File(RUTA_FACTURAS_JSON);
 		if (archivo.exists() && archivo.length() > 0) {
@@ -309,6 +287,7 @@ public class RegistroFactura {
 		return new ArrayList<>();
 	}
 
+	// Guardar
 	private boolean guardarFacturas(List<Factura> facturas) {
 		try {
 			objectMapper.writeValue(new File(RUTA_FACTURAS_JSON), facturas);
@@ -319,19 +298,21 @@ public class RegistroFactura {
 		}
 	}
 
+	// Limpiar campos
 	private void limpiarCampos() {
 		txtNumeroFactura.clear();
-		dateFechaEmision.setValue(LocalDate.now()); // Resetear a fecha actual
+		dateFechaEmision.setValue(LocalDate.now());
 		txtCedulaClienteFactura.clear();
 		txtNombreClienteFactura.clear();
 		areaDescripcionFactura.clear();
 		txtSubtotalFactura.clear();
 		txtIVAFactura.clear();
-		// txtTotalFactura se limpiará automáticamente por los listeners
 		cmbMetodoPago.getSelectionModel().clearSelection();
 		txtNumeroFactura.requestFocus();
 	}
 
+	// Mostrar alerta
+	/// Validacion
 	private void mostrarAlertaValidacion(String titulo, List<String> mensajes) {
 		Alert alert = new Alert(Alert.AlertType.WARNING);
 		alert.setTitle(titulo);
@@ -344,6 +325,7 @@ public class RegistroFactura {
 		alert.showAndWait();
 	}
 
+	/// Infomacion
 	private void mostrarAlertaInformacion(String titulo, String mensaje) {
 		Alert alert = new Alert(Alert.AlertType.INFORMATION);
 		alert.setTitle(titulo);
@@ -352,6 +334,7 @@ public class RegistroFactura {
 		alert.showAndWait();
 	}
 
+	/// Error
 	private void mostrarAlertaError(String titulo, String mensaje) {
 		Alert alert = new Alert(Alert.AlertType.ERROR);
 		alert.setTitle(titulo);

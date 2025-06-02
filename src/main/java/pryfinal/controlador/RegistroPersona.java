@@ -1,34 +1,28 @@
 // Paquete
 package pryfinal.controlador;
 
-// Imports JavaFX
+// Imports
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
-import javafx.stage.Stage;
-
-// Imports para JSON (Jackson)
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-
-// Imports para archivos y listas
+import pryfinal.modelo.Persona;
+import pryfinal.modelo.Usuario;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
-// Modelos
-import pryfinal.modelo.Persona;
-import pryfinal.modelo.Usuario; // Para obtener el tipo de usuario actual
-
 // Clase RegistroPersona
 public class RegistroPersona {
-
+	// Variables
+	/// FXML
 	@FXML private TextField txtCedulaPersona;
 	@FXML private TextField txtNombrePersona;
 	@FXML private TextField txtApellido;
@@ -38,17 +32,17 @@ public class RegistroPersona {
 	@FXML private TextField txtEmail;
 	@FXML private Button btnRegistrarPersona;
 
+	/// Patrones
+	private final Pattern PATRON_NOMBRE_APELLIDO = Pattern.compile("^[\\p{L} .'-]+$");
+	private final Pattern PATRON_EMAIL = Pattern.compile("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,6}$");
+
+	/// Otros
 	private ObjectMapper objectMapper;
 	private final String RUTA_PERSONAS_JSON = "data/personas.json";
 	private final String RUTA_DIRECTORIO_DATOS = "data";
+	private Usuario usuarioActual;
 
-	// Patrón para nombres, apellidos (letras, espacios, acentos, ñ)
-	private final Pattern PATRON_NOMBRE_APELLIDO = Pattern.compile("^[\\p{L} .'-]+$");
-	// Patrón básico para email (simplificado)
-	private final Pattern PATRON_EMAIL = Pattern.compile("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,6}$");
-
-	private Usuario usuarioActual; // Para determinar el rol del usuario logueado
-
+	// Incializar
 	@FXML
 	public void initialize() {
 		objectMapper = new ObjectMapper();
@@ -58,13 +52,9 @@ public class RegistroPersona {
 		if (!directorioDatos.exists()) {
 			directorioDatos.mkdirs();
 		}
-		// La configuración del ComboBox basada en el rol se hará cuando se setee el usuarioActual
 	}
 
-	/**
-	 * Método para ser llamado desde MenuPrincipal para pasar el usuario logueado.
-	 * Esto es necesario para restringir el ComboBox cmbTipoPersona.
-	 */
+	// Pasar el usuario logueado.
 	public void configurarConUsuario(Usuario usuario) {
 		this.usuarioActual = usuario;
 		configurarTipoPersonaSegunRol();
@@ -72,8 +62,8 @@ public class RegistroPersona {
 
 	private void configurarTipoPersonaSegunRol() {
 		if (usuarioActual == null) {
-			cmbTipoPersona.setDisable(true); // Deshabilitar si no hay usuario
-			cmbTipoPersona.getItems().clear(); // Limpiar items para evitar selecciones inválidas
+			cmbTipoPersona.setDisable(true);
+			cmbTipoPersona.getItems().clear();
 			return;
 		}
 
@@ -89,9 +79,9 @@ public class RegistroPersona {
 			cmbTipoPersona.setValue("Encargado de bodega");
 			cmbTipoPersona.setDisable(true);
 		}
-		// Para "admin", el ComboBox permanece habilitado con todas las opciones.
 	}
 
+	// Boton registrar persona
 	@FXML
 	private void handleRegistrarPersona(ActionEvent event) {
 		List<String> errores = validarCampos();
@@ -113,7 +103,7 @@ public class RegistroPersona {
 
 		List<Persona> personas = cargarPersonas();
 
-		// Opcional: Verificar si ya existe una persona con la misma cédula
+		// Verificar si ya existe una persona con la misma cédula
 		boolean personaYaExiste = personas.stream().anyMatch(p -> p.getCedula() == cedula);
 		if (personaYaExiste) {
 			mostrarAlertaError("Registro Duplicado", "Ya existe una persona registrada con la cédula: " + cedula);
@@ -130,6 +120,7 @@ public class RegistroPersona {
 		}
 	}
 
+	// Validacion
 	private List<String> validarCampos() {
 		List<String> errores = new ArrayList<>();
 
@@ -174,7 +165,7 @@ public class RegistroPersona {
 			errores.add("- Número de celular no puede estar vacío.");
 		} else if (!celularStr.matches("\\d+")) {
 			errores.add("- Número de celular debe contener solo números.");
-		} else if (celularStr.length() < 5 || celularStr.length() > 13) { // Misma validación que cédula por simplicidad
+		} else if (celularStr.length() < 5 || celularStr.length() > 13) {
 			errores.add("- Número de celular debe tener entre 5 y 13 dígitos.");
 		}
 
@@ -197,6 +188,7 @@ public class RegistroPersona {
 		return errores;
 	}
 
+	// Cargar
 	private List<Persona> cargarPersonas() {
 		File archivo = new File(RUTA_PERSONAS_JSON);
 		if (archivo.exists() && archivo.length() > 0) {
@@ -209,6 +201,7 @@ public class RegistroPersona {
 		return new ArrayList<>();
 	}
 
+	// Guardar
 	private boolean guardarPersonas(List<Persona> personas) {
 		try {
 			objectMapper.writeValue(new File(RUTA_PERSONAS_JSON), personas);
@@ -219,19 +212,20 @@ public class RegistroPersona {
 		}
 	}
 
+	// Limpiar campos
 	private void limpiarCampos() {
 		txtCedulaPersona.clear();
 		txtNombrePersona.clear();
 		txtApellido.clear();
-		if (!cmbTipoPersona.isDisabled()) { // Solo limpiar si no está deshabilitado por rol
-			cmbTipoPersona.getSelectionModel().clearSelection();
-		}
+		if (!cmbTipoPersona.isDisabled()) { cmbTipoPersona.getSelectionModel().clearSelection(); }
 		txtTelefono.clear();
 		txtDireccion.clear();
 		txtEmail.clear();
 		txtCedulaPersona.requestFocus();
 	}
 
+	// Mostrar alerta
+	/// Validacion
 	private void mostrarAlertaValidacion(String titulo, List<String> mensajes) {
 		Alert alert = new Alert(Alert.AlertType.WARNING);
 		alert.setTitle(titulo);
@@ -244,6 +238,7 @@ public class RegistroPersona {
 		alert.showAndWait();
 	}
 
+	/// Infomacion
 	private void mostrarAlertaInformacion(String titulo, String mensaje) {
 		Alert alert = new Alert(Alert.AlertType.INFORMATION);
 		alert.setTitle(titulo);
@@ -252,6 +247,7 @@ public class RegistroPersona {
 		alert.showAndWait();
 	}
 
+	/// Error
 	private void mostrarAlertaError(String titulo, String mensaje) {
 		Alert alert = new Alert(Alert.AlertType.ERROR);
 		alert.setTitle(titulo);

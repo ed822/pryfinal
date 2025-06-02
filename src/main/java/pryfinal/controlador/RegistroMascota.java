@@ -1,33 +1,27 @@
 // Paquete
 package pryfinal.controlador;
 
-// Imports JavaFX
+// Imports
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
-import javafx.stage.Stage;
-
-// Imports para JSON (Jackson)
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-
-// Imports para archivos y listas
+import pryfinal.modelo.Mascota;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Pattern; // Para validación con expresiones regulares
-
-// Modelo
-import pryfinal.modelo.Mascota;
+import java.util.regex.Pattern;
 
 // Clase RegistroMascota
 public class RegistroMascota {
-
+	// Variables
+	/// FXML
 	@FXML private TextField txtCedulaDueno;
 	@FXML private TextField txtNombreMascota;
 	@FXML private TextField txtEspecie;
@@ -37,14 +31,13 @@ public class RegistroMascota {
 	@FXML private TextField txtPesoMascota;
 	@FXML private Button btnRegistrarMascota;
 
+	/// Otros
 	private ObjectMapper objectMapper;
 	private final String RUTA_MASCOTAS_JSON = "data/mascotas.json";
 	private final String RUTA_DIRECTORIO_DATOS = "data";
-
-	// Patrón para nombres, especies, razas (letras, espacios, acentos, ñ)
 	private final Pattern PATRON_TEXTO_GENERAL = Pattern.compile("^[\\p{L} .'-]+$");
 
-
+	// Inicializar
 	@FXML
 	public void initialize() {
 		objectMapper = new ObjectMapper();
@@ -55,11 +48,9 @@ public class RegistroMascota {
 		if (!directorioDatos.exists()) {
 			directorioDatos.mkdirs();
 		}
-
-		// Cargar valores por defecto en ComboBox si no están en FXML (aunque ya están)
-		// cmbSexoMascota.getItems().addAll("Macho", "Hembra", "Desconocido");
 	}
 
+	// Boton registrar
 	@FXML
 	private void handleRegistrarMascota(ActionEvent event) {
 		List<String> errores = validarCampos();
@@ -94,6 +85,7 @@ public class RegistroMascota {
 		}
 	}
 
+	// Validacion
 	private List<String> validarCampos() {
 		List<String> errores = new ArrayList<>();
 
@@ -175,6 +167,7 @@ public class RegistroMascota {
 		return errores;
 	}
 
+	// Cargar
 	private List<Mascota> cargarMascotas() {
 		File archivo = new File(RUTA_MASCOTAS_JSON);
 		if (archivo.exists() && archivo.length() > 0) {
@@ -187,6 +180,7 @@ public class RegistroMascota {
 		return new ArrayList<>();
 	}
 
+	// Guardar
 	private boolean guardarMascotas(List<Mascota> mascotas) {
 		try {
 			objectMapper.writeValue(new File(RUTA_MASCOTAS_JSON), mascotas);
@@ -197,6 +191,7 @@ public class RegistroMascota {
 		}
 	}
 
+	// Limpiar campos
 	private void limpiarCampos() {
 		txtCedulaDueno.clear();
 		txtNombreMascota.clear();
@@ -208,6 +203,8 @@ public class RegistroMascota {
 		txtCedulaDueno.requestFocus(); // Devolver foco al primer campo
 	}
 
+	// Mostrar alerta
+	/// Validacion
 	private void mostrarAlertaValidacion(String titulo, List<String> mensajes) {
 		Alert alert = new Alert(Alert.AlertType.WARNING);
 		alert.setTitle(titulo);
@@ -221,6 +218,7 @@ public class RegistroMascota {
 		alert.showAndWait();
 	}
 
+	/// Infomacion
 	private void mostrarAlertaInformacion(String titulo, String mensaje) {
 		Alert alert = new Alert(Alert.AlertType.INFORMATION);
 		alert.setTitle(titulo);
@@ -229,6 +227,7 @@ public class RegistroMascota {
 		alert.showAndWait();
 	}
 
+	/// Error
 	private void mostrarAlertaError(String titulo, String mensaje) {
 		Alert alert = new Alert(Alert.AlertType.ERROR);
 		alert.setTitle(titulo);

@@ -1,71 +1,51 @@
 // Paquete
 package pryfinal.controlador;
 
-// Importaciones de JavaFX
-import javafx.event.ActionEvent;
-import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.PasswordField;
-import javafx.scene.control.TextField;
-import javafx.stage.Stage;
-import javafx.scene.Node;
-
-// Importaciones para JSON (Jackson)
+// Imports
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-
-// Importaciones para archivos y SHA-256
+import javafx.event.ActionEvent;
+import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.scene.control.*;
+import javafx.stage.Stage;
+import pryfinal.modelo.Usuario;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-//import java.nio.file.Files; // No usado directamente aquí
-//import java.nio.file.Paths; // No usado directamente aquí
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
-import java.util.List;
-//import java.util.Objects; // No usado directamente aquí
-import java.util.Optional;
 import java.util.Formatter;
-
-// Importar el modelo de Usuario
-import pryfinal.modelo.Usuario;
+import java.util.List;
+import java.util.Optional;
 
 // Clase IncioSesion
 public class InicioSesion {
+	// Variables
+	/// FXML
+	@FXML private ComboBox<String> cmbTipoUsuario;
+	@FXML private TextField txtNombreUsuario;
+	@FXML private PasswordField txtContrasena;
+	@FXML private Button btnRegistrarUsuario;
+	@FXML private Button btnIniciarSesion;
 
-	@FXML
-	private ComboBox<String> cmbTipoUsuario;
-
-	@FXML
-	private TextField txtNombreUsuario;
-
-	@FXML
-	private PasswordField txtContrasena;
-
-	@FXML
-	private Button btnRegistrarUsuario;
-
-	@FXML
-	private Button btnIniciarSesion;
-
+	/// Otros
 	private final String ADMIN_USERNAME = "admin";
 	private final String ADMIN_USER_TYPE = "admin";
 	private final String RUTA_DIRECTORIO_DATOS = "data";
 	private final String RUTA_USUARIOS_JSON = RUTA_DIRECTORIO_DATOS + "/usuarios.json";
-
 	private ObjectMapper objectMapper;
 
+	// Incializar
 	@FXML
 	public void initialize() {
 		objectMapper = new ObjectMapper();
-		objectMapper.enable(SerializationFeature.INDENT_OUTPUT); // Para JSON legible
+		objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
 
 		File directorioDatos = new File(RUTA_DIRECTORIO_DATOS);
 		if (!directorioDatos.exists()) {
@@ -94,12 +74,14 @@ public class InicioSesion {
 		}
 	}
 
+	// Si existe admin
 	private boolean verificarSiAdminExiste() {
 		List<Usuario> usuarios = cargarUsuarios();
 		return usuarios.stream()
 			.anyMatch(u -> ADMIN_USER_TYPE.equals(u.getTipo()) && ADMIN_USERNAME.equals(u.getNombre()));
 	}
 
+	// Registrar
 	@FXML
 	private void handleRegistrarUsuario(ActionEvent event) {
 		String tipoUsuario = cmbTipoUsuario.getValue();
@@ -150,6 +132,7 @@ public class InicioSesion {
 		}
 	}
 
+	// Inciar Sesion
 	@FXML
 	private void handleIniciarSesion(ActionEvent event) {
 		String tipoUsuarioSeleccionado = cmbTipoUsuario.getValue();
@@ -186,6 +169,7 @@ public class InicioSesion {
 		}
 	}
 
+	// Cargar
 	private List<Usuario> cargarUsuarios() {
 		File archivo = new File(RUTA_USUARIOS_JSON);
 		if (archivo.exists() && archivo.length() > 0) {
@@ -198,6 +182,7 @@ public class InicioSesion {
 		return new ArrayList<>();
 	}
 
+	// Guardar
 	private boolean guardarUsuarios(List<Usuario> usuarios) {
 		try {
 			File directorioDatos = new File(RUTA_DIRECTORIO_DATOS);
@@ -215,6 +200,7 @@ public class InicioSesion {
 		}
 	}
 
+	// Hasear contrasena
 	private String hashearContrasena(String contrasena) {
 		try {
 			MessageDigest digest = MessageDigest.getInstance("SHA-256");
@@ -232,6 +218,7 @@ public class InicioSesion {
 		}
 	}
 
+	// Menu principal
 	private void abrirMenuPrincipal(ActionEvent event, Usuario usuarioLogueado) {
 		try {
 			FXMLLoader loader = new FXMLLoader(getClass().getResource("/pryfinal/vista/MenuPrincipal.fxml"));
@@ -242,13 +229,13 @@ public class InicioSesion {
 			escenarioMenuPrincipal.setTitle("Menú Principal - Veterinaria");
 			escenarioMenuPrincipal.setScene(new Scene(root, 800, 600));
 
-			// Obtener el controlador del MenuPrincipal y pasarle el usuario Y EL ESCENARIO
+			// Obtener el controlador del MenuPrincipal y pasarle usuario Y escenario
 			MenuPrincipal controladorMenuPrincipal = loader.getController();
 			controladorMenuPrincipal.configurarParaUsuario(usuarioLogueado, escenarioMenuPrincipal);
 
 			escenarioMenuPrincipal.show();
 
-			// Cerrar la ventana actual de inicio de sesión
+			// Cerrar ventana
 			((Stage) ((Node) event.getSource()).getScene().getWindow()).close();
 
 		} catch (IOException e) {
@@ -258,6 +245,7 @@ public class InicioSesion {
 		}
 	}
 
+	// Mostrar alerta
 	private void mostrarAlerta(String titulo, String mensaje) {
 		Alert alert = new Alert(Alert.AlertType.INFORMATION);
 		if (titulo.toLowerCase().contains("error")) {
@@ -269,6 +257,7 @@ public class InicioSesion {
 		alert.showAndWait();
 	}
 
+	// Limpiar campos
 	private void limpiarCampos() {
 		if (cmbTipoUsuario.getValue() == null || !ADMIN_USER_TYPE.equals(cmbTipoUsuario.getValue())) {
 			txtNombreUsuario.clear();

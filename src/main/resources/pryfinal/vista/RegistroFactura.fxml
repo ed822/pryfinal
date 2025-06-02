@@ -1,77 +1,68 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.collections.FXCollections?>
-<?import java.lang.String?>
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.ComboBox?>
-<?import javafx.scene.control.DatePicker?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.TextArea?>
-<?import javafx.scene.control.TextField?>
-<?import javafx.scene.layout.GridPane?>
-<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import java.lang.*?>
+<GridPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="pryfinal.controlador.RegistroFactura" hgap="10" vgap="10" style="-fx-padding: 20;">
 
-<GridPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
-	fx:controller="pryfinal.controlador.RegistroFactura"
-	hgap="10" vgap="10" style="-fx-padding: 20;">
+	<columnConstraints>
+		<ColumnConstraints minWidth="140" prefWidth="140" />
+		<ColumnConstraints hgrow="ALWAYS" minWidth="220" prefWidth="280"/>
+	</columnConstraints>
 
-<columnConstraints>
-	<ColumnConstraints minWidth="140" prefWidth="140" />
-	<ColumnConstraints hgrow="ALWAYS" minWidth="220" prefWidth="280"/>
-</columnConstraints>
+	<!-- Número de Factura -->
+	<Label text="Número de Factura:" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+	<TextField fx:id="txtNumeroFactura" promptText="Ej: FAC-00123" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
 
-<!-- Número de Factura -->
-<Label text="Número de Factura:" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
-<TextField fx:id="txtNumeroFactura" promptText="Ej: FAC-00123" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+	<!-- Fecha de Emisión -->
+	<Label text="Fecha de Emisión:" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
+	<DatePicker fx:id="dateFechaEmision" promptText="Seleccionar fecha" GridPane.columnIndex="1" GridPane.rowIndex="1" prefWidth="280.0"/>
 
-<!-- Fecha de Emisión -->
-<Label text="Fecha de Emisión:" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
-<DatePicker fx:id="dateFechaEmision" promptText="Seleccionar fecha" GridPane.columnIndex="1" GridPane.rowIndex="1" prefWidth="280.0"/>
+	<!-- Cédula del Cliente -->
+	<Label text="Cédula del Cliente:" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
+	<TextField fx:id="txtCedulaClienteFactura" promptText="Cédula del dueño de la mascota" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
 
-<!-- Cédula del Cliente -->
-<Label text="Cédula del Cliente:" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
-<TextField fx:id="txtCedulaClienteFactura" promptText="Cédula del dueño de la mascota" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
+	<!-- Nombre del Cliente -->
+	<Label text="Nombre del Cliente:" GridPane.columnIndex="0" GridPane.rowIndex="3"/>
+	<TextField fx:id="txtNombreClienteFactura" promptText="Nombre" GridPane.columnIndex="1" GridPane.rowIndex="3"/>
 
-<!-- Nombre del Cliente -->
-<Label text="Nombre del Cliente:" GridPane.columnIndex="0" GridPane.rowIndex="3"/>
-<TextField fx:id="txtNombreClienteFactura" promptText="Nombre" GridPane.columnIndex="1" GridPane.rowIndex="3"/>
+	<!-- Descripción / Concepto -->
+	<Label text="Descripción/Concepto:" GridPane.columnIndex="0" GridPane.rowIndex="4"/>
+	<TextArea fx:id="areaDescripcionFactura" promptText="Detalle de servicios o productos" GridPane.columnIndex="1" GridPane.rowIndex="4" prefHeight="80.0" wrapText="true"/>
 
-<!-- Descripción / Concepto -->
-<Label text="Descripción/Concepto:" GridPane.columnIndex="0" GridPane.rowIndex="4"/>
-<TextArea fx:id="areaDescripcionFactura" promptText="Detalle de servicios o productos" GridPane.columnIndex="1" GridPane.rowIndex="4" prefHeight="80.0" wrapText="true"/>
+	<!-- Subtotal -->
+	<Label text="Subtotal:" GridPane.columnIndex="0" GridPane.rowIndex="5"/>
+	<TextField fx:id="txtSubtotalFactura" promptText="Ej: 50.00" GridPane.columnIndex="1" GridPane.rowIndex="5"/>
 
-<!-- Subtotal -->
-<Label text="Subtotal:" GridPane.columnIndex="0" GridPane.rowIndex="5"/>
-<TextField fx:id="txtSubtotalFactura" promptText="Ej: 50.00" GridPane.columnIndex="1" GridPane.rowIndex="5"/>
+	<!-- IVA -->
+	<Label text="IVA (%):" GridPane.columnIndex="0" GridPane.rowIndex="6"/>
+	<TextField fx:id="txtIVAFactura" promptText="Ej: 12 (o valor calculado)" GridPane.columnIndex="1" GridPane.rowIndex="6"/>
 
-<!-- IVA -->
-<Label text="IVA (%):" GridPane.columnIndex="0" GridPane.rowIndex="6"/>
-<TextField fx:id="txtIVAFactura" promptText="Ej: 12 (o valor calculado)" GridPane.columnIndex="1" GridPane.rowIndex="6"/>
+	<!-- Total -->
+	<Label text="Total:" GridPane.columnIndex="0" GridPane.rowIndex="7"/>
+	<TextField fx:id="txtTotalFactura" promptText="Valor total" GridPane.columnIndex="1" GridPane.rowIndex="7"/>
 
-<!-- Total -->
-<Label text="Total:" GridPane.columnIndex="0" GridPane.rowIndex="7"/>
-<TextField fx:id="txtTotalFactura" promptText="Valor total" GridPane.columnIndex="1" GridPane.rowIndex="7"/>
+	<!-- Método de Pago -->
+	<Label text="Método de Pago:" GridPane.columnIndex="0" GridPane.rowIndex="8"/>
+	<ComboBox fx:id="cmbMetodoPago" GridPane.columnIndex="1" GridPane.rowIndex="8" prefWidth="280.0">
+		<items>
+			<FXCollections fx:factory="observableArrayList">
+				<String fx:value="Efectivo" />
+				<String fx:value="Tarjeta de Crédito" />
+				<String fx:value="Tarjeta de Débito" />
+				<String fx:value="Transferencia" />
+				<String fx:value="Otro" />
+			</FXCollections>
+		</items>
+		<promptText>Seleccionar método</promptText>
+	</ComboBox>
 
-<!-- Método de Pago -->
-<Label text="Método de Pago:" GridPane.columnIndex="0" GridPane.rowIndex="8"/>
-<ComboBox fx:id="cmbMetodoPago" GridPane.columnIndex="1" GridPane.rowIndex="8" prefWidth="280.0">
-	<items>
-		<FXCollections fx:factory="observableArrayList">
-			<String fx:value="Efectivo" />
-			<String fx:value="Tarjeta de Crédito" />
-			<String fx:value="Tarjeta de Débito" />
-			<String fx:value="Transferencia" />
-			<String fx:value="Otro" />
-		</FXCollections>
-	</items>
-	<promptText>Seleccionar método</promptText>
-</ComboBox>
-
-<!-- Botón Registrar Factura -->
-<Button fx:id="btnRegistrarFactura" text="Registrar Factura" onAction="#handleRegistrarFactura" GridPane.columnIndex="1" GridPane.rowIndex="9" GridPane.halignment="RIGHT">
-	<GridPane.margin>
-		<Insets top="20" />
-	</GridPane.margin>
-</Button>
+	<!-- Botón Registrar Factura -->
+	<Button fx:id="btnRegistrarFactura" text="Registrar Factura" onAction="#handleRegistrarFactura" GridPane.columnIndex="1" GridPane.rowIndex="9" GridPane.halignment="RIGHT">
+		<GridPane.margin>
+			<Insets top="20" />
+		</GridPane.margin>
+	</Button>
 </GridPane>
