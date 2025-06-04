@@ -1,7 +1,8 @@
 // Paquete
 package pryfinal.controlador;
 
-// Imports
+// Imports JavaFX
+
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import javafx.collections.FXCollections;
@@ -10,21 +11,29 @@ import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.input.MouseEvent;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 import pryfinal.modelo.Persona;
+import pryfinal.modelo.Usuario;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
 // Clase ConsultaPersona
 public class ConsultaPersona {
-	// Variables
-	/// FXML
+
 	@FXML private TextField txtBuscarPersona;
 	@FXML private Button btnBuscarPersona;
 	@FXML private Button btnRefrescarPersonas;
 	@FXML private TableView<Persona> tablaPersonas;
+
 	@FXML private TableColumn<Persona, Long> colCedulaPersona;
 	@FXML private TableColumn<Persona, String> colNombrePersona;
 	@FXML private TableColumn<Persona, String> colApellidoPersona;
@@ -33,21 +42,30 @@ public class ConsultaPersona {
 	@FXML private TableColumn<Persona, String> colDireccionPersona;
 	@FXML private TableColumn<Persona, String> colEmailPersona;
 
-	/// Otros
 	private ObjectMapper objectMapper;
 	private final String RUTA_PERSONAS_JSON = "data/personas.json";
-	private ObservableList<Persona> listaObservablePersonas = FXCollections.observableArrayList();
 
-	// Incializar
+	private ObservableList<Persona> listaObservablePersonas = FXCollections.observableArrayList();
+	private FilteredList<Persona> personasFiltradas;
+
+	private Usuario usuarioLogueado; // Para pasar al detalle
+
 	@FXML
 	public void initialize() {
 		objectMapper = new ObjectMapper();
 		configurarColumnasTabla();
 		cargarYMostrarPersonas();
 		configurarFiltroBusqueda();
+		configurarDobleClicEnTabla();
 	}
 
-	// Columnas
+	/**
+	 * Método para ser llamado desde MenuPrincipal para pasar el usuario logueado.
+	 */
+	public void setUsuarioActual(Usuario usuario) {
+		this.usuarioLogueado = usuario;
+	}
+
 	private void configurarColumnasTabla() {
 		colCedulaPersona.setCellValueFactory(new PropertyValueFactory<>("cedula"));
 		colNombrePersona.setCellValueFactory(new PropertyValueFactory<>("nombre"));
@@ -58,7 +76,6 @@ public class ConsultaPersona {
 		colEmailPersona.setCellValueFactory(new PropertyValueFactory<>("email"));
 	}
 
-	// Cargar
 	private void cargarYMostrarPersonas() {
 		listaObservablePersonas.clear();
 		File archivo = new File(RUTA_PERSONAS_JSON);
@@ -75,9 +92,8 @@ public class ConsultaPersona {
 		}
 	}
 
-	// Filtro
 	private void configurarFiltroBusqueda() {
-		FilteredList<Persona> personasFiltradas = new FilteredList<>(listaObservablePersonas, p -> true);
+		personasFiltradas = new FilteredList<>(listaObservablePersonas, p -> true);
 
 		txtBuscarPersona.textProperty().addListener((observable, oldValue, newValue) -> {
 			personasFiltradas.setPredicate(persona -> {
@@ -85,18 +101,10 @@ public class ConsultaPersona {
 					return true;
 				}
 				String textoBusquedaLower = newValue.toLowerCase();
-
-				// Buscar por cedula, nombre o apellido
-				if (String.valueOf(persona.getCedula()).contains(textoBusquedaLower)) {
-					return true;
-				} else if (persona.getNombre().toLowerCase().contains(textoBusquedaLower)) {
-					return true;
-				} else if (persona.getApellido().toLowerCase().contains(textoBusquedaLower)) {
-					return true;
-				} else if (persona.getTipo().toLowerCase().contains(textoBusquedaLower)) {
-					return true;
-				}
-				return false;
+				return String.valueOf(persona.getCedula()).contains(textoBusquedaLower) ||
+					persona.getNombre().toLowerCase().contains(textoBusquedaLower) ||
+					persona.getApellido().toLowerCase().contains(textoBusquedaLower) ||
+					persona.getTipo().toLowerCase().contains(textoBusquedaLower);
 			});
 		});
 
@@ -105,11 +113,47 @@ public class ConsultaPersona {
 		tablaPersonas.setItems(personasOrdenadas);
 	}
 
-	// Buscar
-	@FXML
-	private void handleBuscarPersona(ActionEvent event) { txtBuscarPersona.requestFocus(); }
+	private void configurarDobleClicEnTabla() {
+		tablaPersonas.setOnMouseClicked((MouseEvent event) -> {
+			if (event.getClickCount() == 2) {
+				Persona personaSeleccionada = tablaPersonas.getSelectionModel().getSelectedItem();
+				if (personaSeleccionada != null) {
+					mostrarDetallePersona(personaSeleccionada);
+				}
+			}
+		});
+	}
 
-	// Refrescar
+	private void mostrarDetallePersona(Persona persona) {
+		try {
+			FXMLLoader loader = new FXMLLoader(getClass().getResource("/pryfinal/vista/DetallePersona.fxml"));
+			Parent root = loader.load();
+
+			DetallePersona controller = loader.getController();
+			controller.setConsultaPersonaController(this); // Para refrescar
+			controller.cargarDatos(persona, this.usuarioLogueado); // PASAR USUARIO LOGUEADO
+
+			Stage detalleStage = new Stage();
+			detalleStage.setTitle("Detalle de Persona");
+			detalleStage.setScene(new Scene(root));
+
+			detalleStage.initModality(Modality.WINDOW_MODAL);
+			detalleStage.initOwner(tablaPersonas.getScene().getWindow());
+
+			detalleStage.showAndWait();
+			// refrescarListaPersonas(); // Opcional: actualmente DetallePersona llama a refrescar.
+		} catch (IOException e) {
+			System.err.println("Error al abrir detalle de persona: " + e.getMessage());
+			e.printStackTrace();
+			mostrarAlertaError("Error", "No se pudo mostrar el detalle de la persona.");
+		}
+	}
+
+	@FXML
+	private void handleBuscarPersona(ActionEvent event) {
+		txtBuscarPersona.requestFocus();
+	}
+
 	@FXML
 	private void handleRefrescarPersonas(ActionEvent event) {
 		txtBuscarPersona.clear();
@@ -117,8 +161,13 @@ public class ConsultaPersona {
 		mostrarAlertaInformacion("Datos Actualizados", "La lista de personas ha sido refrescada.");
 	}
 
-	// Mostrar alerta
-	/// Infomacion
+	/**
+	 * Método público para ser llamado desde DetallePersona después de una modificación/eliminación.
+	 */
+	public void refrescarListaPersonas() {
+		cargarYMostrarPersonas();
+	}
+
 	private void mostrarAlertaInformacion(String titulo, String mensaje) {
 		Alert alert = new Alert(Alert.AlertType.INFORMATION);
 		alert.setTitle(titulo);
@@ -127,7 +176,6 @@ public class ConsultaPersona {
 		alert.showAndWait();
 	}
 
-	/// Error
 	private void mostrarAlertaError(String titulo, String mensaje) {
 		Alert alert = new Alert(Alert.AlertType.ERROR);
 		alert.setTitle(titulo);

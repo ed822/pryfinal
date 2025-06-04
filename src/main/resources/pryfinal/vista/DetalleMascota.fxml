@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- Import HBox -->
+
+<?import javafx.collections.FXCollections?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import java.lang.String?>
+<VBox xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="pryfinal.controlador.DetalleMascota" spacing="15" style="-fx-padding: 20;">
+
+	<Label fx:id="lblTituloDetalleMascota" text="Detalle de Mascota" style="-fx-font-size: 18px; -fx-font-weight: bold;">
+		<VBox.margin>
+			<Insets bottom="10.0"/>
+		</VBox.margin>
+	</Label>
+
+	<GridPane hgap="10" vgap="8">
+		<columnConstraints>
+			<ColumnConstraints minWidth="120" prefWidth="120"/>
+			<ColumnConstraints hgrow="ALWAYS" minWidth="200" prefWidth="250"/>
+		</columnConstraints>
+
+		<Label text="Cédula del Dueño:" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+		<TextField fx:id="txtCedulaDueno" editable="false" focusTraversable="false" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+
+		<Label text="Nombre Mascota:" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+		<TextField fx:id="txtNombreMascota" editable="false" focusTraversable="false" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+
+		<Label text="Especie:" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+		<TextField fx:id="txtEspecie" editable="false" focusTraversable="false" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+
+		<Label text="Raza:" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
+		<TextField fx:id="txtRaza" editable="false" focusTraversable="false" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
+
+		<Label text="Edad (años):" GridPane.rowIndex="4" GridPane.columnIndex="0"/>
+		<TextField fx:id="txtEdad" editable="false" focusTraversable="false" GridPane.rowIndex="4" GridPane.columnIndex="1"/>
+
+		<Label text="Sexo:" GridPane.rowIndex="5" GridPane.columnIndex="0"/>
+		<ComboBox fx:id="cmbSexo" disable="true" prefWidth="250.0" GridPane.rowIndex="5" GridPane.columnIndex="1">
+			<items>
+				<FXCollections fx:factory="observableArrayList">
+					<String fx:value="Macho" />
+					<String fx:value="Hembra" />
+					<String fx:value="Desconocido" />
+				</FXCollections>
+			</items>
+		</ComboBox>
+
+		<Label text="Peso (kg):" GridPane.rowIndex="6" GridPane.columnIndex="0"/>
+		<TextField fx:id="txtPeso" editable="false" focusTraversable="false" GridPane.rowIndex="6" GridPane.columnIndex="1"/>
+	</GridPane>
+
+	<!-- Botones de Acción (Modificar/Eliminar) -->
+	<HBox fx:id="botonesAccionBoxMascota" spacing="10" alignment="CENTER_RIGHT" VBox.vgrow="NEVER">
+		<padding><Insets top="10.0"/></padding>
+		<Button fx:id="btnModificarMascota" text="Modificar Mascota" onAction="#handleModificarMascota" prefWidth="160"/>
+		<Button fx:id="btnEliminarMascota" text="Eliminar Mascota" onAction="#handleEliminarMascota" style="-fx-base: #E57373;" prefWidth="160"/>
+	</HBox>
+
+	<!-- Botones de Edición (Guardar/Descartar) -->
+	<HBox fx:id="botonesEdicionBoxMascota" spacing="10" alignment="CENTER_RIGHT" visible="false" managed="false" VBox.vgrow="NEVER">
+		<padding><Insets top="10.0"/></padding>
+		<Button fx:id="btnGuardarCambiosMascota" text="Guardar Cambios" onAction="#handleGuardarCambiosMascota" style="-fx-base: #81C784;" prefWidth="160"/>
+		<Button fx:id="btnDescartarCambiosMascota" text="Descartar Cambios" onAction="#handleDescartarCambiosMascota" prefWidth="160"/>
+	</HBox>
+
+	<Button fx:id="btnCerrarDetalleMascota" text="Cerrar" onAction="#handleCerrar" prefWidth="100" VBox.vgrow="NEVER">
+		<VBox.margin>
+			<Insets top="15.0"/>
+		</VBox.margin>
+	</Button>
+</VBox>

@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<!-- Import DatePicker -->
+
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <VBox xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="pryfinal.controlador.DetalleHistoriaClinica" spacing="15" style="-fx-padding: 20;">
 
-	<Label text="Detalle de Historia Clínica" style="-fx-font-size: 18px; -fx-font-weight: bold;">
+	<Label fx:id="lblTituloDetalleHC" text="Detalle de Historia Clínica" style="-fx-font-size: 18px; -fx-font-weight: bold;">
 		<VBox.margin>
 			<Insets bottom="10.0"/>
 		</VBox.margin>
@@ -13,7 +15,7 @@
 
 	<GridPane hgap="10" vgap="8">
 		<columnConstraints>
-			<ColumnConstraints minWidth="150" prefWidth="150"/>
+			<ColumnConstraints minWidth="150" prefWidth="170"/> <!-- Ajustado para etiquetas largas -->
 			<ColumnConstraints hgrow="ALWAYS" minWidth="250" prefWidth="350"/>
 		</columnConstraints>
 
@@ -24,10 +26,12 @@
 		<TextField fx:id="txtNombreMascotaHC" editable="false" focusTraversable="false" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
 
 		<Label text="Fecha de Visita:" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
-		<TextField fx:id="txtFechaVisitaHC" editable="false" focusTraversable="false" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+		<TextField fx:id="txtFechaVisitaHCDisplay" editable="false" focusTraversable="false" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+		<DatePicker fx:id="dateFechaVisitaHCEdit" visible="false" managed="false" prefWidth="350.0" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+
 
 		<Label text="Veterinario Encargado:" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
-		<TextField fx:id="txtVeterinarioEncargadoHC" editable="false" focusTraversable="false" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
+		<ComboBox fx:id="cmbVeterinarioEncargadoHC" disable="true" prefWidth="350.0" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
 
 		<Label text="Motivo de la Consulta:" GridPane.rowIndex="4" GridPane.columnIndex="0" GridPane.valignment="TOP"/>
 		<TextArea fx:id="areaMotivoConsultaHC" editable="false" focusTraversable="false" wrapText="true" prefHeight="80" GridPane.rowIndex="4" GridPane.columnIndex="1"/>
@@ -41,6 +45,20 @@
 		<Label text="Observaciones Adicionales:" GridPane.rowIndex="7" GridPane.columnIndex="0" GridPane.valignment="TOP"/>
 		<TextArea fx:id="areaObservacionesHC" editable="false" focusTraversable="false" wrapText="true" prefHeight="80" GridPane.rowIndex="7" GridPane.columnIndex="1"/>
 	</GridPane>
+
+	<!-- Botones de Acción (Modificar/Eliminar) -->
+	<HBox fx:id="botonesAccionBoxHC" spacing="10" alignment="CENTER_RIGHT" VBox.vgrow="NEVER">
+		<padding><Insets top="10.0"/></padding>
+		<Button fx:id="btnModificarHC" text="Modificar Historia" onAction="#handleModificarHC" prefWidth="160"/>
+		<Button fx:id="btnEliminarHC" text="Eliminar Historia" onAction="#handleEliminarHC" style="-fx-base: #E57373;" prefWidth="160"/>
+	</HBox>
+
+	<!-- Botones de Edición (Guardar/Descartar) -->
+	<HBox fx:id="botonesEdicionBoxHC" spacing="10" alignment="CENTER_RIGHT" visible="false" managed="false" VBox.vgrow="NEVER">
+		<padding><Insets top="10.0"/></padding>
+		<Button fx:id="btnGuardarCambiosHC" text="Guardar Cambios" onAction="#handleGuardarCambiosHC" style="-fx-base: #81C784;" prefWidth="160"/>
+		<Button fx:id="btnDescartarCambiosHC" text="Descartar Cambios" onAction="#handleDescartarCambiosHC" prefWidth="160"/>
+	</HBox>
 
 	<Button fx:id="btnCerrarDetalleHistoria" text="Cerrar" onAction="#handleCerrar" prefWidth="100" VBox.vgrow="NEVER">
 		<VBox.margin>

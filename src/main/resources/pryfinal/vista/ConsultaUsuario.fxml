@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<VBox xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="pryfinal.controlador.ConsultaUsuario" spacing="10" style="-fx-padding: 15;">
+
+	<Label text="Usuarios del Sistema" style="-fx-font-size: 20px; -fx-font-weight: bold;" alignment="CENTER">
+		<VBox.margin>
+			<Insets bottom="10.0"/>
+		</VBox.margin>
+	</Label>
+
+	<HBox spacing="10" alignment="CENTER_LEFT">
+		<Label text="Buscar Usuario:"/>
+		<TextField fx:id="txtBuscarUsuario" promptText="Nombre de usuario..." HBox.hgrow="ALWAYS"/>
+		<Button fx:id="btnRefrescarUsuarios" text="Refrescar Lista" onAction="#handleRefrescarUsuarios"/>
+		<padding>
+			<Insets bottom="10.0"/>
+		</padding>
+	</HBox>
+
+	<TableView fx:id="tablaUsuarios" VBox.vgrow="ALWAYS">
+		<columns>
+			<TableColumn fx:id="colNombreUsuario" text="Nombre de Usuario" prefWidth="250"/>
+			<TableColumn fx:id="colTipoUsuario" text="Tipo de Usuario" prefWidth="200"/>
+		</columns>
+		<columnResizePolicy>
+			<TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
+		</columnResizePolicy>
+	</TableView>
+
+	<Button fx:id="btnCerrarConsultaUsuarios" text="Cerrar" onAction="#handleCerrarConsultaUsuarios" prefWidth="100">
+		<VBox.margin>
+			<Insets top="15.0"/>
+		</VBox.margin>
+	</Button>
+</VBox>

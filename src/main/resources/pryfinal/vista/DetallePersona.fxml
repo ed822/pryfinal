@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.collections.FXCollections?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import java.lang.String?>
+<VBox xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="pryfinal.controlador.DetallePersona" spacing="15" style="-fx-padding: 20;">
+
+	<Label fx:id="lblTituloDetallePersona" text="Detalle de Persona" style="-fx-font-size: 18px; -fx-font-weight: bold;">
+		<VBox.margin>
+			<Insets bottom="10.0"/>
+		</VBox.margin>
+	</Label>
+
+	<GridPane hgap="10" vgap="8">
+		<columnConstraints>
+			<ColumnConstraints minWidth="130" prefWidth="130"/>
+			<ColumnConstraints hgrow="ALWAYS" minWidth="200" prefWidth="250"/>
+		</columnConstraints>
+
+		<Label text="Cédula:" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+		<TextField fx:id="txtCedulaPersona" editable="false" focusTraversable="false" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+
+		<Label text="Nombre:" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+		<TextField fx:id="txtNombrePersona" editable="false" focusTraversable="false" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+
+		<Label text="Apellido:" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+		<TextField fx:id="txtApellido" editable="false" focusTraversable="false" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+
+		<Label text="Tipo de Persona:" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
+		<ComboBox fx:id="cmbTipoPersona" disable="true" prefWidth="250.0" GridPane.rowIndex="3" GridPane.columnIndex="1">
+			<items>
+				<FXCollections fx:factory="observableArrayList">
+					<String fx:value="Dueño de Mascota"/>
+					<String fx:value="Veterinario"/>
+					<String fx:value="Encargado de bodega"/>
+				</FXCollections>
+			</items>
+		</ComboBox>
+
+		<Label text="Número de Celular:" GridPane.rowIndex="4" GridPane.columnIndex="0"/>
+		<TextField fx:id="txtCelular" editable="false" focusTraversable="false" GridPane.rowIndex="4" GridPane.columnIndex="1"/>
+
+		<Label text="Dirección:" GridPane.rowIndex="5" GridPane.columnIndex="0"/>
+		<TextField fx:id="txtDireccion" editable="false" focusTraversable="false" GridPane.rowIndex="5" GridPane.columnIndex="1"/>
+
+		<Label text="Email:" GridPane.rowIndex="6" GridPane.columnIndex="0"/>
+		<TextField fx:id="txtEmail" editable="false" focusTraversable="false" GridPane.rowIndex="6" GridPane.columnIndex="1"/>
+	</GridPane>
+
+	<!-- Botones de Acción (Modificar/Eliminar) -->
+	<HBox fx:id="botonesAccionBoxPersona" spacing="10" alignment="CENTER_RIGHT" VBox.vgrow="NEVER">
+		<padding><Insets top="10.0"/></padding>
+		<Button fx:id="btnModificarPersona" text="Modificar Persona" onAction="#handleModificarPersona" prefWidth="160"/>
+		<Button fx:id="btnEliminarPersona" text="Eliminar Persona" onAction="#handleEliminarPersona" style="-fx-base: #E57373;" prefWidth="160"/>
+	</HBox>
+
+	<!-- Botones de Edición (Guardar/Descartar) -->
+	<HBox fx:id="botonesEdicionBoxPersona" spacing="10" alignment="CENTER_RIGHT" visible="false" managed="false" VBox.vgrow="NEVER">
+		<padding><Insets top="10.0"/></padding>
+		<Button fx:id="btnGuardarCambiosPersona" text="Guardar Cambios" onAction="#handleGuardarCambiosPersona" style="-fx-base: #81C784;" prefWidth="160"/>
+		<Button fx:id="btnDescartarCambiosPersona" text="Descartar Cambios" onAction="#handleDescartarCambiosPersona" prefWidth="160"/>
+	</HBox>
+
+	<Button fx:id="btnCerrarDetallePersona" text="Cerrar" onAction="#handleCerrar" prefWidth="100" VBox.vgrow="NEVER">
+		<VBox.margin>
+			<Insets top="15.0"/>
+		</VBox.margin>
+	</Button>
+</VBox>

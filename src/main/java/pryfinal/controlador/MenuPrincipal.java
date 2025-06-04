@@ -1,7 +1,8 @@
 // Paquete
 package pryfinal.controlador;
 
-// Imports
+// Imports JavaFX
+
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import javafx.event.ActionEvent;
@@ -11,22 +12,26 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import pryfinal.App;
 import pryfinal.modelo.Persona;
 import pryfinal.modelo.Usuario;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 // Clase MenuPrincipal
 public class MenuPrincipal {
-	// Variables
+
 	private Usuario usuarioActual;
 	private Stage escenarioPrincipal;
 
-	/// FXML
+	@FXML private Button btnCerrarSesion;
 	@FXML private Button btnIrAConsultaMascota;
 	@FXML private Button btnIrAConsultaPersona;
 	@FXML private Button btnIrAConsultaFactura;
@@ -37,19 +42,20 @@ public class MenuPrincipal {
 	@FXML private Button btnIrARegistroFactura;
 	@FXML private Button btnIrARegistroHistoriaClinica;
 	@FXML private Button btnIrARegistroOrdenMedica;
+	@FXML private Button btnAdministrarUsuarios;
 
-	// Otros
 	private final String TIPO_USUARIO_ADMIN = "admin";
 	private final String TIPO_USUARIO_VETERINARIO = "veterinario";
 	private final String TIPO_USUARIO_VENDEDOR = "vendedor";
+
 	private ObjectMapper objectMapper = new ObjectMapper();
 	private final String RUTA_PERSONAS_JSON = "data/personas.json";
 
-	// Incializar (deshabilitar todos los botones por defecto)
 	@FXML
-	public void initialize() { deshabilitarTodosLosBotonesFuncionales(); }
+	public void initialize() {
+		deshabilitarTodosLosBotonesFuncionales();
+	}
 
-	// Usuario
 	public void configurarParaUsuario(Usuario usuario, Stage escenarioPrincipalActual) {
 		this.usuarioActual = usuario;
 		this.escenarioPrincipal = escenarioPrincipalActual;
@@ -57,10 +63,10 @@ public class MenuPrincipal {
 		actualizarVisibilidadBotones();
 	}
 
-	// Visibilidad de botones
 	private void actualizarVisibilidadBotones() {
 		if (usuarioActual == null) {
 			deshabilitarTodosLosBotonesFuncionales();
+			if (btnCerrarSesion != null) btnCerrarSesion.setDisable(true);
 			return;
 		}
 
@@ -69,6 +75,7 @@ public class MenuPrincipal {
 
 		if (TIPO_USUARIO_ADMIN.equals(tipoUsuario)) {
 			habilitarTodosLosBotones();
+			if (btnAdministrarUsuarios != null) btnAdministrarUsuarios.setDisable(false);
 		} else if (TIPO_USUARIO_VETERINARIO.equals(tipoUsuario)) {
 			if (btnIrAConsultaHistoriaClinica != null) btnIrAConsultaHistoriaClinica.setDisable(false);
 			if (btnIrAConsultaMascota != null) btnIrAConsultaMascota.setDisable(false);
@@ -78,15 +85,19 @@ public class MenuPrincipal {
 			if (btnIrARegistroMascota != null) btnIrARegistroMascota.setDisable(false);
 			if (btnIrARegistroOrdenMedica != null) btnIrARegistroOrdenMedica.setDisable(false);
 			if (btnIrARegistroPersona != null) btnIrARegistroPersona.setDisable(false);
+			if (btnAdministrarUsuarios != null) btnAdministrarUsuarios.setDisable(true);
 		} else if (TIPO_USUARIO_VENDEDOR.equals(tipoUsuario)) {
 			if (btnIrAConsultaFactura != null) btnIrAConsultaFactura.setDisable(false);
 			if (btnIrAConsultaPersona != null) btnIrAConsultaPersona.setDisable(false);
 			if (btnIrARegistroFactura != null) btnIrARegistroFactura.setDisable(false);
 			if (btnIrARegistroPersona != null) btnIrARegistroPersona.setDisable(false);
+			if (btnAdministrarUsuarios != null) btnAdministrarUsuarios.setDisable(true);
+		} else {
+			if (btnAdministrarUsuarios != null) btnAdministrarUsuarios.setDisable(true);
 		}
+		if (btnCerrarSesion != null) btnCerrarSesion.setDisable(false);
 	}
 
-	// Habilitar botones
 	private void habilitarTodosLosBotones() {
 		if (btnIrAConsultaMascota != null) btnIrAConsultaMascota.setDisable(false);
 		if (btnIrAConsultaPersona != null) btnIrAConsultaPersona.setDisable(false);
@@ -100,7 +111,6 @@ public class MenuPrincipal {
 		if (btnIrARegistroOrdenMedica != null) btnIrARegistroOrdenMedica.setDisable(false);
 	}
 
-	// Desabilitar botones
 	private void deshabilitarTodosLosBotonesFuncionales() {
 		if (btnIrAConsultaMascota != null) btnIrAConsultaMascota.setDisable(true);
 		if (btnIrAConsultaPersona != null) btnIrAConsultaPersona.setDisable(true);
@@ -112,9 +122,9 @@ public class MenuPrincipal {
 		if (btnIrARegistroFactura != null) btnIrARegistroFactura.setDisable(true);
 		if (btnIrARegistroHistoriaClinica != null) btnIrARegistroHistoriaClinica.setDisable(true);
 		if (btnIrARegistroOrdenMedica != null) btnIrARegistroOrdenMedica.setDisable(true);
+		if (btnAdministrarUsuarios != null) btnAdministrarUsuarios.setDisable(true);
 	}
 
-	// Cargar
 	private List<Persona> cargarPersonasDesdeJson() {
 		File archivoPersonas = new File(RUTA_PERSONAS_JSON);
 		if (archivoPersonas.exists() && archivoPersonas.length() > 0) {
@@ -127,28 +137,21 @@ public class MenuPrincipal {
 		return new ArrayList<>();
 	}
 
-	// Veterinarios registrados
 	private boolean existenVeterinariosRegistrados() {
 		List<Persona> personas = cargarPersonasDesdeJson();
 		return personas.stream().anyMatch(p -> "Veterinario".equalsIgnoreCase(p.getTipo()));
 	}
 
-	// Cargar vista
-	private void cargarVistaModal(String fxmlFile, String title, boolean necesitaUsuario, String tipoVista) {
-		// Verificación para RegistroHistoriaClinica y RegistroOrdenMedica
+	private void cargarVistaModal(String fxmlFile, String title, boolean necesitaUsuarioDirecto, String tipoVista) {
 		if ("RegistroHistoriaClinica".equals(tipoVista) || "RegistroOrdenMedica".equals(tipoVista)) {
 			if (!existenVeterinariosRegistrados()) {
 				Alert alert = new Alert(Alert.AlertType.ERROR);
 				alert.setTitle("Operación no permitida");
 				alert.setHeaderText(null);
-
 				String mensajeErrorVets;
 				String tipoDeRegistro = "";
-				if ("RegistroHistoriaClinica".equals(tipoVista)) {
-					tipoDeRegistro = "entrada de historia clínica";
-				} else if ("RegistroOrdenMedica".equals(tipoVista)) {
-					tipoDeRegistro = "orden médica";
-				}
+				if ("RegistroHistoriaClinica".equals(tipoVista)) tipoDeRegistro = "entrada de historia clínica";
+				else if ("RegistroOrdenMedica".equals(tipoVista)) tipoDeRegistro = "orden médica";
 
 				if (usuarioActual != null && TIPO_USUARIO_ADMIN.equals(usuarioActual.getTipo())) {
 					mensajeErrorVets = "No hay veterinarios registrados en el sistema. Por favor, agregue veterinarios para poder crear una nueva " + tipoDeRegistro + ".";
@@ -164,25 +167,33 @@ public class MenuPrincipal {
 		try {
 			FXMLLoader loader = new FXMLLoader(getClass().getResource("/pryfinal/vista/" + fxmlFile));
 			Parent root = loader.load();
+			Object controladorCargado = loader.getController();
 
-			if (necesitaUsuario) {
-				Object controladorCargado = loader.getController();
+			if (necesitaUsuarioDirecto) { // Específicamente para RegistroPersona
 				if (controladorCargado instanceof RegistroPersona) {
 					((RegistroPersona) controladorCargado).configurarConUsuario(this.usuarioActual);
 				}
 			}
 
+			// Pasar usuario a las vistas de Consulta para que ellas lo pasen a sus Detalles
+			if (controladorCargado instanceof ConsultaMascota) {
+				((ConsultaMascota) controladorCargado).setUsuarioActual(this.usuarioActual);
+			} else if (controladorCargado instanceof ConsultaPersona) {
+				((ConsultaPersona) controladorCargado).setUsuarioActual(this.usuarioActual);
+			} else if (controladorCargado instanceof ConsultaFactura) {
+				((ConsultaFactura) controladorCargado).setUsuarioActual(this.usuarioActual);
+			} else if (controladorCargado instanceof ConsultaHistoriaClinica) {
+				((ConsultaHistoriaClinica) controladorCargado).setUsuarioActual(this.usuarioActual);
+			} else if (controladorCargado instanceof ConsultaOrdenMedica) { // Añadido
+				((ConsultaOrdenMedica) controladorCargado).setUsuarioActual(this.usuarioActual);
+			}
+			// ConsultaUsuario no necesita esto actualmente para su detalle.
+
 			Stage nuevaVentana = new Stage();
 			nuevaVentana.setTitle(title);
 			nuevaVentana.setScene(new Scene(root));
 			nuevaVentana.initModality(Modality.WINDOW_MODAL);
-
-			if (this.escenarioPrincipal != null) {
-				nuevaVentana.initOwner(this.escenarioPrincipal);
-			} else {
-				System.err.println("Advertencia: escenarioPrincipal no estaba seteado al abrir ventana modal.");
-			}
-
+			if (this.escenarioPrincipal != null) nuevaVentana.initOwner(this.escenarioPrincipal);
 			nuevaVentana.showAndWait();
 
 		} catch (IOException e) {
@@ -196,16 +207,31 @@ public class MenuPrincipal {
 		}
 	}
 
-	// Métodos que llaman a cargarVistaModal
+	@FXML
+	private void handleCerrarSesion(ActionEvent event) {
+		Alert confirmacion = new Alert(Alert.AlertType.CONFIRMATION);
+		confirmacion.setTitle("Confirmar Cierre de Sesión");
+		confirmacion.setHeaderText("¿Está seguro de que desea cerrar la sesión?");
+		confirmacion.setContentText("Será redirigido a la pantalla de inicio de sesión.");
+
+		Optional<ButtonType> resultado = confirmacion.showAndWait();
+		if (resultado.isPresent() && resultado.get() == ButtonType.OK) {
+			Stage stageActual = (Stage) btnCerrarSesion.getScene().getWindow();
+			stageActual.close();
+			App.reiniciarALogin();
+		}
+	}
+
 	@FXML private void irAConsultaMascota(ActionEvent event) { cargarVistaModal("ConsultaMascota.fxml", "Consultar Mascotas", false, null); }
 	@FXML private void irAConsultaPersona(ActionEvent event) { cargarVistaModal("ConsultaPersona.fxml", "Consultar Personas", false, null); }
 	@FXML private void irAConsultaFactura(ActionEvent event) { cargarVistaModal("ConsultaFactura.fxml", "Consultar Facturas", false, null); }
 	@FXML private void irAConsultaHistoriaClinica(ActionEvent event) { cargarVistaModal("ConsultaHistoriaClinica.fxml", "Consultar Historias Clínicas", false, null); }
 	@FXML private void irAConsultaOrdenMedica(ActionEvent event) { cargarVistaModal("ConsultaOrdenMedica.fxml", "Consultar Órdenes Médicas", false, null); }
+	@FXML private void irAConsultarUsuarios(ActionEvent event) { cargarVistaModal("ConsultaUsuario.fxml", "Administrar Usuarios del Sistema", false, "ConsultaUsuario"); }
 
 	@FXML private void irARegistroMascota(ActionEvent event) { cargarVistaModal("RegistroMascota.fxml", "Registrar Nueva Mascota", false, null); }
 	@FXML private void irARegistroPersona(ActionEvent event) { cargarVistaModal("RegistroPersona.fxml", "Registrar Nueva Persona", true, "RegistroPersona"); }
 	@FXML private void irARegistroFactura(ActionEvent event) { cargarVistaModal("RegistroFactura.fxml", "Registrar Nueva Factura", false, null); }
 	@FXML private void irARegistroHistoriaClinica(ActionEvent event) { cargarVistaModal("RegistroHistoriaClinica.fxml", "Registrar Entrada de Historia Clínica", false, "RegistroHistoriaClinica"); }
 	@FXML private void irARegistroOrdenMedica(ActionEvent event) { cargarVistaModal("RegistroOrdenMedica.fxml", "Registrar Nueva Orden Médica", false, "RegistroOrdenMedica"); }
-}
+	}

@@ -1,7 +1,8 @@
 // Paquete
 package pryfinal.controlador;
 
-// Imports
+// Imports JavaFX
+
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import javafx.collections.FXCollections;
@@ -10,10 +11,18 @@ import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.input.MouseEvent;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 import javafx.util.StringConverter;
 import pryfinal.modelo.Factura;
+import pryfinal.modelo.Usuario;
+
 import java.io.File;
 import java.io.IOException;
 import java.time.LocalDate;
@@ -24,8 +33,7 @@ import java.util.function.Predicate;
 
 // Clase ConsultaFactura
 public class ConsultaFactura {
-	// Variables
-	/// FXML
+
 	@FXML private TextField txtBuscarFactura;
 	@FXML private DatePicker dateDesdeFactura;
 	@FXML private DatePicker dateHastaFactura;
@@ -33,7 +41,7 @@ public class ConsultaFactura {
 	@FXML private Button btnRefrescarFacturas;
 	@FXML private TableView<Factura> tablaFacturas;
 
-	//// Columnas
+	// Columnas
 	@FXML private TableColumn<Factura, String> colNumeroFactura;
 	@FXML private TableColumn<Factura, String> colFechaEmisionFactura;
 	@FXML private TableColumn<Factura, Long> colCedulaClienteFactura;
@@ -44,14 +52,15 @@ public class ConsultaFactura {
 	@FXML private TableColumn<Factura, Double> colTotalFactura;
 	@FXML private TableColumn<Factura, String> colMetodoPagoFactura;
 
-	/// Otros
 	private ObjectMapper objectMapper;
 	private final String RUTA_FACTURAS_JSON = "data/facturas.json";
 	private final DateTimeFormatter FORMATO_FECHA_TABLA = DateTimeFormatter.ISO_LOCAL_DATE;
+
 	private ObservableList<Factura> listaObservableFacturas = FXCollections.observableArrayList();
 	private FilteredList<Factura> facturasFiltradas;
 
-	// Incializar
+	private Usuario usuarioLogueado; // Para pasar al detalle
+
 	@FXML
 	public void initialize() {
 		objectMapper = new ObjectMapper();
@@ -59,9 +68,16 @@ public class ConsultaFactura {
 		configurarDatePickers();
 		cargarYMostrarFacturas();
 		configurarFiltroDinamico();
+		configurarDobleClicEnTabla();
 	}
 
-	// Configurar columnas tabla
+	/**
+	 * Método para ser llamado desde MenuPrincipal para pasar el usuario logueado.
+	 */
+	public void setUsuarioActual(Usuario usuario) {
+		this.usuarioLogueado = usuario;
+	}
+
 	private void configurarColumnasTabla() {
 		colNumeroFactura.setCellValueFactory(new PropertyValueFactory<>("factura"));
 		colFechaEmisionFactura.setCellValueFactory(new PropertyValueFactory<>("fecha"));
@@ -74,23 +90,15 @@ public class ConsultaFactura {
 		colMetodoPagoFactura.setCellValueFactory(new PropertyValueFactory<>("metodo"));
 	}
 
-	// Configurar date pickers
 	private void configurarDatePickers() {
 		StringConverter<LocalDate> converter = new StringConverter<LocalDate>() {
-			@Override
-			public String toString(LocalDate date) {
-				return (date != null) ? FORMATO_FECHA_TABLA.format(date) : "";
-			}
-			@Override
-			public LocalDate fromString(String string) {
-				return (string != null && !string.isEmpty()) ? LocalDate.parse(string, FORMATO_FECHA_TABLA) : null;
-			}
-		};
+			@Override public String toString(LocalDate date) { return (date != null) ? FORMATO_FECHA_TABLA.format(date) : ""; }
+			@Override public LocalDate fromString(String string) { return (string != null && !string.isEmpty()) ? LocalDate.parse(string, FORMATO_FECHA_TABLA) : null; }
+			};
 		dateDesdeFactura.setConverter(converter);
 		dateHastaFactura.setConverter(converter);
 	}
 
-	// Cargar y mostrar
 	private void cargarYMostrarFacturas() {
 		listaObservableFacturas.clear();
 		File archivo = new File(RUTA_FACTURAS_JSON);
@@ -107,57 +115,78 @@ public class ConsultaFactura {
 		}
 	}
 
-	// Filtro dinamico
 	private void configurarFiltroDinamico() {
 		facturasFiltradas = new FilteredList<>(listaObservableFacturas, p -> true);
-
-		// Listener del TextField (se aplica en tiempo real)
 		txtBuscarFactura.textProperty().addListener((observable, oldValue, newValue) -> aplicarFiltros());
 		SortedList<Factura> facturasOrdenadas = new SortedList<>(facturasFiltradas);
 		facturasOrdenadas.comparatorProperty().bind(tablaFacturas.comparatorProperty());
 		tablaFacturas.setItems(facturasOrdenadas);
 	}
 
-	// Boton Buscar Factura
-	@FXML
-	private void handleBuscarFactura(ActionEvent event) { aplicarFiltros(); }
+	private void configurarDobleClicEnTabla() {
+		tablaFacturas.setOnMouseClicked((MouseEvent event) -> {
+			if (event.getClickCount() == 2) {
+				Factura facturaSeleccionada = tablaFacturas.getSelectionModel().getSelectedItem();
+				if (facturaSeleccionada != null) {
+					mostrarDetalleFactura(facturaSeleccionada);
+				}
+			}
+		});
+	}
 
-	// Aplicar todos los filtros
+	private void mostrarDetalleFactura(Factura factura) {
+		try {
+			FXMLLoader loader = new FXMLLoader(getClass().getResource("/pryfinal/vista/DetalleFactura.fxml"));
+			Parent root = loader.load();
+
+			DetalleFactura controller = loader.getController();
+			controller.setConsultaFacturaController(this);
+			controller.cargarDatos(factura, this.usuarioLogueado); // Pasar usuario logueado
+
+			Stage detalleStage = new Stage();
+			detalleStage.setTitle("Detalle de Factura");
+			detalleStage.setScene(new Scene(root));
+
+			detalleStage.initModality(Modality.WINDOW_MODAL);
+			detalleStage.initOwner(tablaFacturas.getScene().getWindow());
+
+			detalleStage.showAndWait();
+		} catch (IOException e) {
+			System.err.println("Error al abrir detalle de factura: " + e.getMessage());
+			e.printStackTrace();
+			mostrarAlertaError("Error", "No se pudo mostrar el detalle de la factura.");
+		}
+	}
+
+	@FXML
+	private void handleBuscarFactura(ActionEvent event) {
+		aplicarFiltros();
+	}
+
 	private void aplicarFiltros() {
 		String textoBusqueda = txtBuscarFactura.getText().toLowerCase().trim();
 		LocalDate fechaDesde = dateDesdeFactura.getValue();
 		LocalDate fechaHasta = dateHastaFactura.getValue();
 
-		// Predicados (Predicate) para cada filtro
 		Predicate<Factura> predicadoTexto = factura -> {
-			if (textoBusqueda.isEmpty()) { return true; }
+			if (textoBusqueda.isEmpty()) return true;
 			return factura.getFactura().toLowerCase().contains(textoBusqueda) ||
 				String.valueOf(factura.getCedula()).contains(textoBusqueda) ||
 				factura.getNombre().toLowerCase().contains(textoBusqueda);
 		};
-
 		Predicate<Factura> predicadoFechaDesde = factura -> {
-			if (fechaDesde == null) { return true; }
-			try {
-				LocalDate fechaFactura = LocalDate.parse(factura.getFecha(), FORMATO_FECHA_TABLA);
-				return !fechaFactura.isBefore(fechaDesde);
-			} catch (DateTimeParseException e) { return true; /* o false si se considera inválida */ }
+			if (fechaDesde == null) return true;
+			try { LocalDate fechaFactura = LocalDate.parse(factura.getFecha(), FORMATO_FECHA_TABLA); return !fechaFactura.isBefore(fechaDesde); }
+			catch (DateTimeParseException e) { return true; }
 		};
-
 		Predicate<Factura> predicadoFechaHasta = factura -> {
-			if (fechaHasta == null) { return true; }
-			try {
-				LocalDate fechaFactura = LocalDate.parse(factura.getFecha(), FORMATO_FECHA_TABLA);
-				return !fechaFactura.isAfter(fechaHasta);
-			} catch (DateTimeParseException e) { return true; /* o false si se considera inválida */ }
+			if (fechaHasta == null) return true;
+			try { LocalDate fechaFactura = LocalDate.parse(factura.getFecha(), FORMATO_FECHA_TABLA); return !fechaFactura.isAfter(fechaHasta); }
+			catch (DateTimeParseException e) { return true; }
 		};
-
-		// Combinar todos los predicados
 		facturasFiltradas.setPredicate(predicadoTexto.and(predicadoFechaDesde).and(predicadoFechaHasta));
 	}
 
-
-	// Boton refrescar facturas
 	@FXML
 	private void handleRefrescarFacturas(ActionEvent event) {
 		txtBuscarFactura.clear();
@@ -168,8 +197,13 @@ public class ConsultaFactura {
 		mostrarAlertaInformacion("Datos Actualizados", "La lista de facturas ha sido refrescada.");
 	}
 
-	// Mostrar alerta
-	/// Infomacion
+	/**
+	 * Método público para ser llamado desde DetalleFactura después de una modificación/eliminación.
+	 */
+	public void refrescarListaFacturas() {
+		cargarYMostrarFacturas();
+	}
+
 	private void mostrarAlertaInformacion(String titulo, String mensaje) {
 		Alert alert = new Alert(Alert.AlertType.INFORMATION);
 		alert.setTitle(titulo);
@@ -178,7 +212,6 @@ public class ConsultaFactura {
 		alert.showAndWait();
 	}
 
-	/// Error
 	private void mostrarAlertaError(String titulo, String mensaje) {
 		Alert alert = new Alert(Alert.AlertType.ERROR);
 		alert.setTitle(titulo);

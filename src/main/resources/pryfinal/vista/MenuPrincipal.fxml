@@ -1,19 +1,30 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.Insets?>
+<!-- Import Priority -->
+<!-- Import Region for spacer -->
+
+<?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<?import javafx.scene.text.Font?>
-<VBox xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="pryfinal.controlador.MenuPrincipal" alignment="TOP_CENTER" spacing="20" style="-fx-padding: 20;">
+<VBox xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="pryfinal.controlador.MenuPrincipal" alignment="TOP_CENTER" spacing="15" style="-fx-padding: 20;">
 
-	<Label text="Menú Principal - Gestión Veterinaria" textAlignment="CENTER">
-		<font>
-			<Font name="System Bold" size="24.0" />
-		</font>
+		<!-- Contenedor para el título y el botón de logout -->
+	<HBox alignment="CENTER_LEFT" spacing="10" VBox.vgrow="NEVER">
+		<Label text="Menú Principal - Gestión Veterinaria" textAlignment="CENTER" style="-fx-font-size: 22px; -fx-font-weight: bold;"/>
+		<Region HBox.hgrow="ALWAYS"/> <!-- Spacer para empujar el botón a la derecha -->
+		<Button fx:id="btnCerrarSesion" text="Cerrar Sesión" onAction="#handleCerrarSesion"
+			minWidth="100" prefWidth="120" style="-fx-font-size: 12px; -fx-base: #FFAB91;"/> <!-- Estilo opcional para diferenciarlo -->
+		<HBox.margin>
+			<Insets bottom="15.0"/>
+		</HBox.margin>
+	</HBox>
+
+	<Separator HBox.hgrow="ALWAYS" VBox.vgrow="NEVER">
 		<VBox.margin>
-			<Insets bottom="20.0" />
+			<Insets bottom="15.0"/>
 		</VBox.margin>
-	</Label>
+	</Separator>
+
 
 	<HBox alignment="CENTER" spacing="40">
 		<!-- Columna de Consultas -->
@@ -46,4 +57,12 @@
 			<Button fx:id="btnIrARegistroOrdenMedica" text="Registrar Orden Médica Nueva" onAction="#irARegistroOrdenMedica" prefWidth="250" prefHeight="40" wrapText="true"/>
 		</VBox>
 	</HBox>
+
+	<!-- Botón para Administrar Usuarios -->
+	<Button fx:id="btnAdministrarUsuarios" text="Administrar Usuarios del Sistema" onAction="#irAConsultarUsuarios" prefWidth="300" prefHeight="40" style="-fx-font-size: 14px;">
+		<VBox.margin>
+			<Insets top="30.0" />
+		</VBox.margin>
+	</Button>
+
 </VBox>

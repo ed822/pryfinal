@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- Import DatePicker -->
+
+<?import javafx.collections.FXCollections?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import java.lang.*?>
+<VBox xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="pryfinal.controlador.DetalleFactura" spacing="15" style="-fx-padding: 20;">
+
+	<Label fx:id="lblTituloDetalleFactura" text="Detalle de Factura" style="-fx-font-size: 18px; -fx-font-weight: bold;">
+		<VBox.margin>
+			<Insets bottom="10.0"/>
+		</VBox.margin>
+	</Label>
+
+	<GridPane hgap="10" vgap="8">
+		<columnConstraints>
+			<ColumnConstraints minWidth="140" prefWidth="140"/>
+			<ColumnConstraints hgrow="ALWAYS" minWidth="220" prefWidth="280"/>
+		</columnConstraints>
+
+		<Label text="Número de Factura:" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+		<TextField fx:id="txtNumeroFactura" editable="false" focusTraversable="false" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+
+		<Label text="Fecha de Emisión:" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+		<!-- TextField para modo lectura, DatePicker para modo edición -->
+		<TextField fx:id="txtFechaEmisionDisplay" editable="false" focusTraversable="false" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+		<DatePicker fx:id="dateFechaEmisionEdit" visible="false" managed="false" prefWidth="280.0" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+
+		<Label text="Cédula del Cliente:" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+		<TextField fx:id="txtCedulaCliente" editable="false" focusTraversable="false" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+
+		<Label text="Nombre del Cliente:" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
+		<TextField fx:id="txtNombreCliente" editable="false" focusTraversable="false" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
+
+		<Label text="Descripción/Concepto:" GridPane.rowIndex="4" GridPane.columnIndex="0" GridPane.valignment="TOP"/>
+		<TextArea fx:id="areaDescripcion" editable="false" focusTraversable="false" wrapText="true" prefHeight="100" GridPane.rowIndex="4" GridPane.columnIndex="1"/>
+
+		<Label text="Subtotal:" GridPane.rowIndex="5" GridPane.columnIndex="0"/>
+		<TextField fx:id="txtSubtotal" editable="false" focusTraversable="false" GridPane.rowIndex="5" GridPane.columnIndex="1"/>
+
+		<Label text="IVA (%):" GridPane.rowIndex="6" GridPane.columnIndex="0"/>
+		<TextField fx:id="txtIVA" editable="false" focusTraversable="false" GridPane.rowIndex="6" GridPane.columnIndex="1"/>
+
+		<Label text="Total:" GridPane.rowIndex="7" GridPane.columnIndex="0"/>
+		<TextField fx:id="txtTotal" editable="false" focusTraversable="false" GridPane.rowIndex="7" GridPane.columnIndex="1"/> <!-- Total sigue siendo no editable directamente -->
+
+		<Label text="Método de Pago:" GridPane.rowIndex="8" GridPane.columnIndex="0"/>
+		<ComboBox fx:id="cmbMetodoPago" disable="true" prefWidth="280.0" GridPane.rowIndex="8" GridPane.columnIndex="1">
+			<items>
+				<FXCollections fx:factory="observableArrayList">
+					<String fx:value="Efectivo" />
+					<String fx:value="Tarjeta de Crédito" />
+					<String fx:value="Tarjeta de Débito" />
+					<String fx:value="Transferencia" />
+					<String fx:value="Otro" />
+				</FXCollections>
+			</items>
+		</ComboBox>
+	</GridPane>
+
+	<!-- Botones de Acción (Modificar/Eliminar) -->
+	<HBox fx:id="botonesAccionBoxFactura" spacing="10" alignment="CENTER_RIGHT" VBox.vgrow="NEVER">
+		<padding><Insets top="10.0"/></padding>
+		<Button fx:id="btnModificarFactura" text="Modificar Factura" onAction="#handleModificarFactura" prefWidth="160"/>
+		<Button fx:id="btnEliminarFactura" text="Eliminar Factura" onAction="#handleEliminarFactura" style="-fx-base: #E57373;" prefWidth="160"/>
+	</HBox>
+
+	<!-- Botones de Edición (Guardar/Descartar) -->
+	<HBox fx:id="botonesEdicionBoxFactura" spacing="10" alignment="CENTER_RIGHT" visible="false" managed="false" VBox.vgrow="NEVER">
+		<padding><Insets top="10.0"/></padding>
+		<Button fx:id="btnGuardarCambiosFactura" text="Guardar Cambios" onAction="#handleGuardarCambiosFactura" style="-fx-base: #81C784;" prefWidth="160"/>
+		<Button fx:id="btnDescartarCambiosFactura" text="Descartar Cambios" onAction="#handleDescartarCambiosFactura" prefWidth="160"/>
+	</HBox>
+
+	<Button fx:id="btnCerrarDetalleFactura" text="Cerrar" onAction="#handleCerrar" prefWidth="100" VBox.vgrow="NEVER">
+		<VBox.margin>
+			<Insets top="15.0"/>
+		</VBox.margin>
+	</Button>
+</VBox>

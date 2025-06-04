@@ -2,6 +2,7 @@
 package pryfinal.controlador;
 
 // Imports
+
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -13,6 +14,7 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 import pryfinal.modelo.Persona;
 import pryfinal.modelo.Usuario;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
