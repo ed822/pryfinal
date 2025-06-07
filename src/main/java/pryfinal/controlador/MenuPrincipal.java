@@ -1,8 +1,7 @@
 // Paquete
 package pryfinal.controlador;
 
-// Imports JavaFX
-
+// Imports
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import javafx.event.ActionEvent;
@@ -18,7 +17,6 @@ import javafx.stage.Stage;
 import pryfinal.App;
 import pryfinal.modelo.Persona;
 import pryfinal.modelo.Usuario;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -27,10 +25,11 @@ import java.util.Optional;
 
 // Clase MenuPrincipal
 public class MenuPrincipal {
-
+	// Variables
 	private Usuario usuarioActual;
 	private Stage escenarioPrincipal;
 
+	/// FXML
 	@FXML private Button btnCerrarSesion;
 	@FXML private Button btnIrAConsultaMascota;
 	@FXML private Button btnIrAConsultaPersona;
@@ -44,18 +43,18 @@ public class MenuPrincipal {
 	@FXML private Button btnIrARegistroOrdenMedica;
 	@FXML private Button btnAdministrarUsuarios;
 
+	/// Otros
 	private final String TIPO_USUARIO_ADMIN = "admin";
 	private final String TIPO_USUARIO_VETERINARIO = "veterinario";
 	private final String TIPO_USUARIO_VENDEDOR = "vendedor";
-
 	private ObjectMapper objectMapper = new ObjectMapper();
 	private final String RUTA_PERSONAS_JSON = "data/personas.json";
 
+	// Initialize (inicializar)
 	@FXML
-	public void initialize() {
-		deshabilitarTodosLosBotonesFuncionales();
-	}
+	public void initialize() { deshabilitarTodosLosBotonesFuncionales(); }
 
+	// Para usuario
 	public void configurarParaUsuario(Usuario usuario, Stage escenarioPrincipalActual) {
 		this.usuarioActual = usuario;
 		this.escenarioPrincipal = escenarioPrincipalActual;
@@ -63,6 +62,7 @@ public class MenuPrincipal {
 		actualizarVisibilidadBotones();
 	}
 
+	// Botones
 	private void actualizarVisibilidadBotones() {
 		if (usuarioActual == null) {
 			deshabilitarTodosLosBotonesFuncionales();
@@ -98,6 +98,7 @@ public class MenuPrincipal {
 		if (btnCerrarSesion != null) btnCerrarSesion.setDisable(false);
 	}
 
+	// Habilitar todos los botones
 	private void habilitarTodosLosBotones() {
 		if (btnIrAConsultaMascota != null) btnIrAConsultaMascota.setDisable(false);
 		if (btnIrAConsultaPersona != null) btnIrAConsultaPersona.setDisable(false);
@@ -111,6 +112,7 @@ public class MenuPrincipal {
 		if (btnIrARegistroOrdenMedica != null) btnIrARegistroOrdenMedica.setDisable(false);
 	}
 
+	// Deshabilitar todos los botones
 	private void deshabilitarTodosLosBotonesFuncionales() {
 		if (btnIrAConsultaMascota != null) btnIrAConsultaMascota.setDisable(true);
 		if (btnIrAConsultaPersona != null) btnIrAConsultaPersona.setDisable(true);
@@ -125,6 +127,7 @@ public class MenuPrincipal {
 		if (btnAdministrarUsuarios != null) btnAdministrarUsuarios.setDisable(true);
 	}
 
+	// Cargar
 	private List<Persona> cargarPersonasDesdeJson() {
 		File archivoPersonas = new File(RUTA_PERSONAS_JSON);
 		if (archivoPersonas.exists() && archivoPersonas.length() > 0) {
@@ -137,11 +140,13 @@ public class MenuPrincipal {
 		return new ArrayList<>();
 	}
 
+	// Veterinario
 	private boolean existenVeterinariosRegistrados() {
 		List<Persona> personas = cargarPersonasDesdeJson();
 		return personas.stream().anyMatch(p -> "Veterinario".equalsIgnoreCase(p.getTipo()));
 	}
 
+	// Vista modal
 	private void cargarVistaModal(String fxmlFile, String title, boolean necesitaUsuarioDirecto, String tipoVista) {
 		if ("RegistroHistoriaClinica".equals(tipoVista) || "RegistroOrdenMedica".equals(tipoVista)) {
 			if (!existenVeterinariosRegistrados()) {
@@ -169,13 +174,13 @@ public class MenuPrincipal {
 			Parent root = loader.load();
 			Object controladorCargado = loader.getController();
 
-			if (necesitaUsuarioDirecto) { // Específicamente para RegistroPersona
+			if (necesitaUsuarioDirecto) {
 				if (controladorCargado instanceof RegistroPersona) {
 					((RegistroPersona) controladorCargado).configurarConUsuario(this.usuarioActual);
 				}
 			}
 
-			// Pasar usuario a las vistas de Consulta para que ellas lo pasen a sus Detalles
+			// Pasar usuario a las consultas para que ellas lo pasen a sus detalles
 			if (controladorCargado instanceof ConsultaMascota) {
 				((ConsultaMascota) controladorCargado).setUsuarioActual(this.usuarioActual);
 			} else if (controladorCargado instanceof ConsultaPersona) {
@@ -184,10 +189,9 @@ public class MenuPrincipal {
 				((ConsultaFactura) controladorCargado).setUsuarioActual(this.usuarioActual);
 			} else if (controladorCargado instanceof ConsultaHistoriaClinica) {
 				((ConsultaHistoriaClinica) controladorCargado).setUsuarioActual(this.usuarioActual);
-			} else if (controladorCargado instanceof ConsultaOrdenMedica) { // Añadido
+			} else if (controladorCargado instanceof ConsultaOrdenMedica) {
 				((ConsultaOrdenMedica) controladorCargado).setUsuarioActual(this.usuarioActual);
 			}
-			// ConsultaUsuario no necesita esto actualmente para su detalle.
 
 			Stage nuevaVentana = new Stage();
 			nuevaVentana.setTitle(title);
@@ -207,6 +211,7 @@ public class MenuPrincipal {
 		}
 	}
 
+	// Cerrar sesion
 	@FXML
 	private void handleCerrarSesion(ActionEvent event) {
 		Alert confirmacion = new Alert(Alert.AlertType.CONFIRMATION);
@@ -222,6 +227,7 @@ public class MenuPrincipal {
 		}
 	}
 
+	// CargarVistaModal
 	@FXML private void irAConsultaMascota(ActionEvent event) { cargarVistaModal("ConsultaMascota.fxml", "Consultar Mascotas", false, null); }
 	@FXML private void irAConsultaPersona(ActionEvent event) { cargarVistaModal("ConsultaPersona.fxml", "Consultar Personas", false, null); }
 	@FXML private void irAConsultaFactura(ActionEvent event) { cargarVistaModal("ConsultaFactura.fxml", "Consultar Facturas", false, null); }
@@ -234,4 +240,4 @@ public class MenuPrincipal {
 	@FXML private void irARegistroFactura(ActionEvent event) { cargarVistaModal("RegistroFactura.fxml", "Registrar Nueva Factura", false, null); }
 	@FXML private void irARegistroHistoriaClinica(ActionEvent event) { cargarVistaModal("RegistroHistoriaClinica.fxml", "Registrar Entrada de Historia Clínica", false, "RegistroHistoriaClinica"); }
 	@FXML private void irARegistroOrdenMedica(ActionEvent event) { cargarVistaModal("RegistroOrdenMedica.fxml", "Registrar Nueva Orden Médica", false, "RegistroOrdenMedica"); }
-	}
+}

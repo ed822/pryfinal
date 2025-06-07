@@ -1,8 +1,7 @@
 // Paquete
 package pryfinal.controlador;
 
-// Importaciones de JavaFX
-
+// Imports
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -15,7 +14,6 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
 import pryfinal.modelo.Usuario;
-
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -28,38 +26,29 @@ import java.util.Optional;
 
 // Clase IncioSesion
 public class InicioSesion {
+	// Variables
+	/// FXML
+	@FXML private ComboBox<String> cmbTipoUsuario;
+	@FXML private TextField txtNombreUsuario;
+	@FXML private PasswordField txtContrasena;
+	@FXML private Button btnRegistrarUsuario;
+	@FXML private Button btnIniciarSesion;
 
-	@FXML
-	private ComboBox<String> cmbTipoUsuario;
-
-	@FXML
-	private TextField txtNombreUsuario;
-
-	@FXML
-	private PasswordField txtContrasena;
-
-	@FXML
-	private Button btnRegistrarUsuario;
-
-	@FXML
-	private Button btnIniciarSesion;
-
+	/// Otros
 	private final String ADMIN_USERNAME = "admin";
 	private final String ADMIN_USER_TYPE = "admin";
 	private final String RUTA_DIRECTORIO_DATOS = "data";
 	private final String RUTA_USUARIOS_JSON = RUTA_DIRECTORIO_DATOS + "/usuarios.json";
-
 	private ObjectMapper objectMapper;
 
+	// Initialize (inicializar)
 	@FXML
 	public void initialize() {
 		objectMapper = new ObjectMapper();
-		objectMapper.enable(SerializationFeature.INDENT_OUTPUT); // Para JSON legible
+		objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
 
 		File directorioDatos = new File(RUTA_DIRECTORIO_DATOS);
-		if (!directorioDatos.exists()) {
-			directorioDatos.mkdirs();
-		}
+		if (!directorioDatos.exists()) { directorioDatos.mkdirs(); }
 
 		cmbTipoUsuario.getSelectionModel().selectedItemProperty().addListener((options, oldValue, newValue) -> {
 			if (ADMIN_USER_TYPE.equals(newValue)) {
@@ -83,12 +72,14 @@ public class InicioSesion {
 		}
 	}
 
+	// Verificar si admin existe
 	private boolean verificarSiAdminExiste() {
 		List<Usuario> usuarios = cargarUsuarios();
 		return usuarios.stream()
 			.anyMatch(u -> ADMIN_USER_TYPE.equals(u.getTipo()) && ADMIN_USERNAME.equals(u.getNombre()));
 	}
 
+	// Registrar
 	@FXML
 	private void handleRegistrarUsuario(ActionEvent event) {
 		String tipoUsuario = cmbTipoUsuario.getValue();
@@ -110,21 +101,20 @@ public class InicioSesion {
 
 		List<Usuario> usuarios = cargarUsuarios();
 
-		// 1. Verificar si el nombre de usuario "admin" está siendo usado por un tipo no admin
+		// Verificar si "admin" está siendo usado por un tipo no admin
 		if (!ADMIN_USER_TYPE.equals(tipoUsuario) && ADMIN_USERNAME.equalsIgnoreCase(nombreUsuario)) {
 			mostrarAlerta("Error de Registro", "El nombre de usuario '" + ADMIN_USERNAME + "' está reservado para el administrador.");
 			return;
 		}
 
-		// 2. Lógica especial para el tipo "admin"
+		// Lógica para el tipo admin
 		if (ADMIN_USER_TYPE.equals(tipoUsuario)) {
-			if (verificarSiAdminExiste()) { // Esto ya implica que nombreUsuario es "admin"
+			if (verificarSiAdminExiste()) {
 				mostrarAlerta("Error de Registro", "El usuario 'admin' ya ha sido registrado. No se pueden crear más administradores.");
 				return;
 			}
-			// Si no existe, se procederá a registrar el único admin (nombreUsuario ya es "admin" por la UI)
 		} else {
-			// 3. Verificar si el nombre de usuario (no admin) ya existe GLOBALMENTE
+			// Verificar si el nombre de usuario (no admin) ya existe
 			boolean nombreUsuarioGlobalmenteExiste = usuarios.stream()
 				.anyMatch(u -> u.getNombre().equalsIgnoreCase(nombreUsuario));
 			if (nombreUsuarioGlobalmenteExiste) {
@@ -149,6 +139,7 @@ public class InicioSesion {
 		}
 	}
 
+	// Inciar sesion
 	@FXML
 	private void handleIniciarSesion(ActionEvent event) {
 		String tipoUsuarioSeleccionado = cmbTipoUsuario.getValue();
@@ -185,6 +176,7 @@ public class InicioSesion {
 		}
 	}
 
+	// Cargar
 	private List<Usuario> cargarUsuarios() {
 		File archivo = new File(RUTA_USUARIOS_JSON);
 		if (archivo.exists() && archivo.length() > 0) {
@@ -197,6 +189,7 @@ public class InicioSesion {
 		return new ArrayList<>();
 	}
 
+	// Guardar
 	private boolean guardarUsuarios(List<Usuario> usuarios) {
 		try {
 			File directorioDatos = new File(RUTA_DIRECTORIO_DATOS);
@@ -214,6 +207,7 @@ public class InicioSesion {
 		}
 	}
 
+	// Hashear contresena
 	private String hashearContrasena(String contrasena) {
 		try {
 			MessageDigest digest = MessageDigest.getInstance("SHA-256");
@@ -231,6 +225,7 @@ public class InicioSesion {
 		}
 	}
 
+	// Menu principal
 	private void abrirMenuPrincipal(ActionEvent event, Usuario usuarioLogueado) {
 		try {
 			FXMLLoader loader = new FXMLLoader(getClass().getResource("/pryfinal/vista/MenuPrincipal.fxml"));
@@ -254,6 +249,7 @@ public class InicioSesion {
 		}
 	}
 
+	// Mostrar alerta
 	private void mostrarAlerta(String titulo, String mensaje) {
 		Alert alert = new Alert(Alert.AlertType.INFORMATION);
 		if (titulo.toLowerCase().contains("error")) {
@@ -265,6 +261,7 @@ public class InicioSesion {
 		alert.showAndWait();
 	}
 
+	// Limpiar campos
 	private void limpiarCampos() {
 		if (cmbTipoUsuario.getValue() == null || !ADMIN_USER_TYPE.equals(cmbTipoUsuario.getValue())) {
 			txtNombreUsuario.clear();
