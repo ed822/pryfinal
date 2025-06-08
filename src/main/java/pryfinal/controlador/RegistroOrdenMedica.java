@@ -2,7 +2,6 @@
 package pryfinal.controlador;
 
 // Imports
-
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -14,7 +13,6 @@ import javafx.scene.control.*;
 import javafx.util.StringConverter;
 import pryfinal.modelo.OrdenMedica;
 import pryfinal.modelo.Persona;
-
 import java.io.File;
 import java.io.IOException;
 import java.time.LocalDate;

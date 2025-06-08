@@ -1,8 +1,7 @@
 // Paquete
 package pryfinal.controlador;
 
-// Imports JavaFX
-
+// Imports
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import javafx.collections.FXCollections;
@@ -22,7 +21,6 @@ import javafx.stage.Stage;
 import javafx.util.StringConverter;
 import pryfinal.modelo.OrdenMedica;
 import pryfinal.modelo.Usuario;
-
 import java.io.File;
 import java.io.IOException;
 import java.time.LocalDate;
@@ -33,15 +31,14 @@ import java.util.function.Predicate;
 
 // Clase ConsultaOrdenMedica
 public class ConsultaOrdenMedica {
-
+	// Variables
+	/// FXML
 	@FXML private TextField txtBuscarOrdenMedica;
 	@FXML private DatePicker dateDesdeOrden;
 	@FXML private DatePicker dateHastaOrden;
 	@FXML private Button btnBuscarOrdenMedica;
 	@FXML private Button btnRefrescarOrdenesMedicas;
 	@FXML private TableView<OrdenMedica> tablaOrdenesMedicas;
-
-	// Columnas
 	@FXML private TableColumn<OrdenMedica, String> colNumeroOrden;
 	@FXML private TableColumn<OrdenMedica, String> colFechaEmisionOrden;
 	@FXML private TableColumn<OrdenMedica, Long> colCedulaDuenoOrden;
@@ -50,15 +47,15 @@ public class ConsultaOrdenMedica {
 	@FXML private TableColumn<OrdenMedica, String> colMedicamentosBreveOrden;
 	@FXML private TableColumn<OrdenMedica, String> colDuracionTratamientoOrden;
 
+	/// Otros
 	private ObjectMapper objectMapper;
 	private final String RUTA_ORDENES_JSON = "data/ordenes_medicas.json";
 	private final DateTimeFormatter FORMATO_FECHA_TABLA = DateTimeFormatter.ISO_LOCAL_DATE;
-
 	private ObservableList<OrdenMedica> listaObservableOrdenes = FXCollections.observableArrayList();
 	private FilteredList<OrdenMedica> ordenesFiltradas;
+	private Usuario usuarioLogueado;
 
-	private Usuario usuarioLogueado; // Para pasar al detalle
-
+	// Initialize (inicializar)
 	@FXML
 	public void initialize() {
 		objectMapper = new ObjectMapper();
@@ -69,13 +66,10 @@ public class ConsultaOrdenMedica {
 		configurarDobleClicEnTabla();
 	}
 
-	/**
-	 * Método para ser llamado desde MenuPrincipal para pasar el usuario logueado.
-	 */
-	public void setUsuarioActual(Usuario usuario) {
-		this.usuarioLogueado = usuario;
-	}
+	// Usuraio actual (llamado por MenuPrincipal)
+	public void setUsuarioActual(Usuario usuario) { this.usuarioLogueado = usuario; }
 
+	// Columnas
 	private void configurarColumnasTabla() {
 		colNumeroOrden.setCellValueFactory(new PropertyValueFactory<>("numero"));
 		colFechaEmisionOrden.setCellValueFactory(new PropertyValueFactory<>("fecha"));
@@ -86,6 +80,7 @@ public class ConsultaOrdenMedica {
 		colDuracionTratamientoOrden.setCellValueFactory(new PropertyValueFactory<>("duracion"));
 	}
 
+	// Date picker
 	private void configurarDatePickers() {
 		StringConverter<LocalDate> converter = new StringConverter<LocalDate>() {
 			@Override public String toString(LocalDate date) { return (date != null) ? FORMATO_FECHA_TABLA.format(date) : ""; }
@@ -95,6 +90,7 @@ public class ConsultaOrdenMedica {
 		dateHastaOrden.setConverter(converter);
 	}
 
+	// Cargar
 	private void cargarYMostrarOrdenes() {
 		listaObservableOrdenes.clear();
 		File archivo = new File(RUTA_ORDENES_JSON);
@@ -110,6 +106,7 @@ public class ConsultaOrdenMedica {
 		}
 	}
 
+	// Filtro
 	private void configurarFiltroDinamico() {
 		ordenesFiltradas = new FilteredList<>(listaObservableOrdenes, p -> true);
 		txtBuscarOrdenMedica.textProperty().addListener((obs, old, val) -> aplicarFiltros());
@@ -119,6 +116,7 @@ public class ConsultaOrdenMedica {
 		tablaOrdenesMedicas.setItems(ordenesOrdenadas);
 	}
 
+	// Doble click
 	private void configurarDobleClicEnTabla() {
 		tablaOrdenesMedicas.setOnMouseClicked((MouseEvent event) -> {
 			if (event.getClickCount() == 2) {
@@ -130,6 +128,7 @@ public class ConsultaOrdenMedica {
 		});
 	}
 
+	// Detalle
 	private void mostrarDetalleOrden(OrdenMedica orden) {
 		try {
 			FXMLLoader loader = new FXMLLoader(getClass().getResource("/pryfinal/vista/DetalleOrdenMedica.fxml"));
@@ -137,7 +136,7 @@ public class ConsultaOrdenMedica {
 
 			DetalleOrdenMedica controller = loader.getController();
 			controller.setConsultaOrdenMedicaController(this);
-			controller.cargarDatos(orden, this.usuarioLogueado); // Pasar usuario logueado
+			controller.cargarDatos(orden, this.usuarioLogueado);
 
 			Stage detalleStage = new Stage();
 			detalleStage.setTitle("Detalle de Orden Médica");
@@ -154,11 +153,11 @@ public class ConsultaOrdenMedica {
 		}
 	}
 
+	// Buscar
 	@FXML
-	private void handleBuscarOrdenMedica(ActionEvent event) {
-		aplicarFiltros();
-	}
+	private void handleBuscarOrdenMedica(ActionEvent event) { aplicarFiltros(); }
 
+	// Filtros
 	private void aplicarFiltros() {
 		String textoBusqueda = txtBuscarOrdenMedica.getText().toLowerCase().trim();
 		LocalDate fechaDesde = dateDesdeOrden.getValue();
@@ -184,6 +183,7 @@ public class ConsultaOrdenMedica {
 		ordenesFiltradas.setPredicate(predicadoTexto.and(predicadoFechaDesde).and(predicadoFechaHasta));
 	}
 
+	// Refrescar
 	@FXML
 	private void handleRefrescarOrdenesMedicas(ActionEvent event) {
 		txtBuscarOrdenMedica.clear();
@@ -194,13 +194,11 @@ public class ConsultaOrdenMedica {
 		mostrarAlertaInformacion("Datos Actualizados", "La lista de órdenes médicas ha sido refrescada.");
 	}
 
-	/**
-	 * Método público para ser llamado desde DetalleOrdenMedica después de una modificación/eliminación.
-	 */
-	public void refrescarListaOrdenesMedicas() {
-		cargarYMostrarOrdenes();
-	}
+	// Refrescar (llamado por DetalleOrdenMedica)
+	public void refrescarListaOrdenesMedicas() { cargarYMostrarOrdenes(); }
 
+	// Alerta
+	/// Informacion
 	private void mostrarAlertaInformacion(String titulo, String mensaje) {
 		Alert alert = new Alert(Alert.AlertType.INFORMATION);
 		alert.setTitle(titulo);
@@ -209,6 +207,7 @@ public class ConsultaOrdenMedica {
 		alert.showAndWait();
 	}
 
+	/// Error
 	private void mostrarAlertaError(String titulo, String mensaje) {
 		Alert alert = new Alert(Alert.AlertType.ERROR);
 		alert.setTitle(titulo);

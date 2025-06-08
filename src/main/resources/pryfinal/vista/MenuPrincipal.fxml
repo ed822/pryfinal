@@ -1,8 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!-- Import Priority -->
-<!-- Import Region for spacer -->
-
 <?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
@@ -13,7 +10,7 @@
 		<Label text="Menú Principal - Gestión Veterinaria" textAlignment="CENTER" style="-fx-font-size: 22px; -fx-font-weight: bold;"/>
 		<Region HBox.hgrow="ALWAYS"/> <!-- Spacer para empujar el botón a la derecha -->
 		<Button fx:id="btnCerrarSesion" text="Cerrar Sesión" onAction="#handleCerrarSesion"
-			minWidth="100" prefWidth="120" style="-fx-font-size: 12px; -fx-base: #FFAB91;"/> <!-- Estilo opcional para diferenciarlo -->
+			minWidth="100" prefWidth="120" style="-fx-font-size: 12px; -fx-base: #FFAB91;"/>
 		<HBox.margin>
 			<Insets bottom="15.0"/>
 		</HBox.margin>

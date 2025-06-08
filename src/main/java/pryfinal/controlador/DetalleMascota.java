@@ -1,8 +1,7 @@
 // Paquete
 package pryfinal.controlador;
 
-// Imports JavaFX
-
+// Imports
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -13,7 +12,6 @@ import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 import pryfinal.modelo.Mascota;
 import pryfinal.modelo.Usuario;
-
 import java.io.File;
 import java.io.IOException;
 import java.text.DecimalFormat;
@@ -24,7 +22,8 @@ import java.util.regex.Pattern;
 
 // Clase DetalleMascota
 public class DetalleMascota {
-
+	// Variables
+	/// FXML
 	@FXML private Label lblTituloDetalleMascota;
 	@FXML private TextField txtCedulaDueno;
 	@FXML private TextField txtNombreMascota;
@@ -33,29 +32,26 @@ public class DetalleMascota {
 	@FXML private TextField txtEdad;
 	@FXML private ComboBox<String> cmbSexo;
 	@FXML private TextField txtPeso;
-
 	@FXML private HBox botonesAccionBoxMascota;
 	@FXML private Button btnModificarMascota;
 	@FXML private Button btnEliminarMascota;
-
 	@FXML private HBox botonesEdicionBoxMascota;
 	@FXML private Button btnGuardarCambiosMascota;
 	@FXML private Button btnDescartarCambiosMascota;
-
 	@FXML private Button btnCerrarDetalleMascota;
 
+	/// Otros
 	private Mascota mascotaSeleccionada;
 	private Usuario usuarioActual;
-	private ConsultaMascota consultaMascotaController; // CORREGIDO AQUÍ
+	private ConsultaMascota consultaMascotaController;
 	private boolean enModoEdicion = false;
-
 	private ObjectMapper objectMapper;
 	private final String RUTA_MASCOTAS_JSON = "data/mascotas.json";
 	private final String ADMIN_USER_TYPE = "admin";
 	private final DecimalFormat FORMATO_EDAD = new DecimalFormat("#0.0");
 	private final Pattern PATRON_TEXTO_GENERAL = Pattern.compile("^[\\p{L} .'-]+$");
 
-
+	// Initialize (incializer)
 	@FXML
 	public void initialize() {
 		objectMapper = new ObjectMapper();
@@ -63,10 +59,12 @@ public class DetalleMascota {
 		actualizarVisibilidadBotonesEdicion();
 	}
 
-	public void setConsultaMascotaController(ConsultaMascota controller) { // CORREGIDO AQUÍ
+	// Controlador Consulta
+	public void setConsultaMascotaController(ConsultaMascota controller) {
 		this.consultaMascotaController = controller;
 	}
 
+	// Cargar
 	public void cargarDatos(Mascota mascota, Usuario usuarioLogueado) {
 		this.mascotaSeleccionada = mascota;
 		this.usuarioActual = usuarioLogueado;
@@ -84,12 +82,14 @@ public class DetalleMascota {
 		salirModoEdicion();
 	}
 
+	// Rol usuario
 	private void configurarSegunRolUsuario() {
 		boolean esAdmin = usuarioActual != null && ADMIN_USER_TYPE.equals(usuarioActual.getTipo());
 		btnModificarMascota.setDisable(!esAdmin);
 		btnEliminarMascota.setDisable(!esAdmin);
 	}
 
+	// Modo edicion
 	private void entrarModoEdicion() {
 		enModoEdicion = true;
 		lblTituloDetalleMascota.setText("Modificar Mascota");
@@ -102,6 +102,7 @@ public class DetalleMascota {
 		actualizarVisibilidadBotonesEdicion();
 	}
 
+	// Salir modo edicion
 	private void salirModoEdicion() {
 		enModoEdicion = false;
 		lblTituloDetalleMascota.setText("Detalle de Mascota");
@@ -118,6 +119,7 @@ public class DetalleMascota {
 		actualizarVisibilidadBotonesEdicion();
 	}
 
+	// Valores originales
 	private void cargarValoresOriginales() {
 		txtNombreMascota.setText(mascotaSeleccionada.getNombreMascota());
 		txtEspecie.setText(mascotaSeleccionada.getEspecie());
@@ -127,6 +129,7 @@ public class DetalleMascota {
 		txtPeso.setText(String.valueOf(mascotaSeleccionada.getPeso()));
 	}
 
+	// Visibilidad botones
 	private void actualizarVisibilidadBotonesEdicion() {
 		botonesAccionBoxMascota.setVisible(!enModoEdicion);
 		botonesAccionBoxMascota.setManaged(!enModoEdicion);
@@ -135,11 +138,11 @@ public class DetalleMascota {
 		btnCerrarDetalleMascota.setVisible(!enModoEdicion);
 	}
 
+	// Modificar
 	@FXML
-	private void handleModificarMascota(ActionEvent event) {
-		entrarModoEdicion();
-	}
+	private void handleModificarMascota(ActionEvent event) { entrarModoEdicion(); }
 
+	// Guardar cambios
 	@FXML
 	private void handleGuardarCambiosMascota(ActionEvent event) {
 		if (mascotaSeleccionada == null) return;
@@ -173,7 +176,7 @@ public class DetalleMascota {
 			if (guardarMascotasEnJson(mascotas)) {
 				mostrarAlerta("Éxito", "Mascota actualizada correctamente.");
 				this.mascotaSeleccionada = mascotaParaActualizar;
-				if (consultaMascotaController != null) { // CORREGIDO AQUÍ
+				if (consultaMascotaController != null) {
 					consultaMascotaController.refrescarListaMascotas();
 				}
 			} else {
@@ -185,11 +188,13 @@ public class DetalleMascota {
 		salirModoEdicion();
 	}
 
+	// Descartar
 	@FXML
 	private void handleDescartarCambiosMascota(ActionEvent event) {
 		salirModoEdicion();
 	}
 
+	// Eliminar
 	@FXML
 	private void handleEliminarMascota(ActionEvent event) {
 		if (mascotaSeleccionada == null) return;
@@ -210,7 +215,7 @@ public class DetalleMascota {
 			if (eliminada) {
 				if (guardarMascotasEnJson(mascotas)) {
 					mostrarAlerta("Éxito", "Mascota eliminada correctamente.");
-					if (consultaMascotaController != null) { // CORREGIDO AQUÍ
+					if (consultaMascotaController != null) {
 						consultaMascotaController.refrescarListaMascotas();
 					}
 					handleCerrar(null);
@@ -223,12 +228,13 @@ public class DetalleMascota {
 		}
 	}
 
+	// Validar
 	private List<String> validarCamposParaModificacion() {
 		List<String> errores = new ArrayList<>();
 		String nombre = txtNombreMascota.getText().trim();
-		if (nombre.isEmpty()) errores.add("- Nombre no puede estar vacío.");
-		else if (nombre.length() < 3 || nombre.length() >= 40) errores.add("- Nombre debe tener entre 3 y 39 caracteres.");
-		else if (!PATRON_TEXTO_GENERAL.matcher(nombre).matches()) errores.add("- Nombre solo debe contener letras y caracteres permitidos.");
+		if (nombre.isEmpty()) errores.add("- Nombre de la mascota no puede estar vacío.");
+		else if (nombre.length() < 3 || nombre.length() >= 40) errores.add("- Nombre de la mascota debe tener entre 3 y 39 caracteres.");
+		else if (!PATRON_TEXTO_GENERAL.matcher(nombre).matches()) errores.add("- Nombre de la mascota solo debe contener letras y caracteres permitidos (espacios, ', ., -).");
 
 		String especie = txtEspecie.getText().trim();
 		if (especie.isEmpty()) errores.add("- Especie no puede estar vacía.");
@@ -245,23 +251,24 @@ public class DetalleMascota {
 		else {
 			try {
 				float edad = Float.parseFloat(edadStr);
-				if (edad <= 0 || edad > 40) errores.add("- Edad debe ser > 0 y <= 40.");
-			} catch (NumberFormatException e) { errores.add("- Edad debe ser un número válido."); }
+				if (edad <= 0 || edad > 40) errores.add("- Edad debe ser un número mayor que 0 y menor o igual a 40.");
+			} catch (NumberFormatException e) { errores.add("- Edad debe ser un número válido (ej: 2.5)."); }
 		}
 
-		if (cmbSexo.getValue() == null || cmbSexo.getValue().isEmpty()) errores.add("- Debe seleccionar el sexo.");
+		if (cmbSexo.getValue() == null || cmbSexo.getValue().isEmpty()) errores.add("- Debe seleccionar el sexo de la mascota.");
 
 		String pesoStr = txtPeso.getText().trim();
 		if (pesoStr.isEmpty()) errores.add("- Peso no puede estar vacío.");
 		else {
 			try {
 				int peso = Integer.parseInt(pesoStr);
-				if (peso <= 0 || peso >= 200) errores.add("- Peso debe ser > 0 y < 200.");
+				if (peso <= 0 || peso >= 200) errores.add("- Peso debe ser un número entero mayor que 0 y menor que 200.");
 			} catch (NumberFormatException e) { errores.add("- Peso debe ser un número entero válido."); }
 		}
 		return errores;
 	}
 
+	// Cargar
 	private List<Mascota> cargarMascotasDesdeJson() {
 		File archivo = new File(RUTA_MASCOTAS_JSON);
 		if (archivo.exists() && archivo.length() > 0) {
@@ -271,27 +278,34 @@ public class DetalleMascota {
 		return new ArrayList<>();
 	}
 
+	// Guardar
 	private boolean guardarMascotasEnJson(List<Mascota> mascotas) {
 		try { objectMapper.writeValue(new File(RUTA_MASCOTAS_JSON), mascotas); return true; }
 		catch (IOException e) { System.err.println("Error al guardar mascotas: " + e.getMessage()); return false; }
 	}
 
+	// Cerrar
 	@FXML
 	private void handleCerrar(ActionEvent event) {
 		Stage stage = (Stage) btnCerrarDetalleMascota.getScene().getWindow();
 		stage.close();
 	}
 
+	// Alerta
 	private void mostrarAlerta(String titulo, String mensaje) {
 		Alert alert = new Alert(Alert.AlertType.INFORMATION);
 		alert.setTitle(titulo); alert.setHeaderText(null); alert.setContentText(mensaje);
 		alert.showAndWait();
 	}
+
+	/// Error
 	private void mostrarAlertaError(String titulo, String mensaje) {
 		Alert alert = new Alert(Alert.AlertType.ERROR);
 		alert.setTitle(titulo); alert.setHeaderText(null); alert.setContentText(mensaje);
 		alert.showAndWait();
 	}
+
+	/// Validacion
 	private void mostrarAlertaValidacion(String titulo, List<String> mensajes) {
 		Alert alert = new Alert(Alert.AlertType.WARNING);
 		alert.setTitle(titulo);

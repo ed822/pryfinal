@@ -2,7 +2,6 @@
 package pryfinal.controlador;
 
 // Imports
-
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -13,7 +12,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 import pryfinal.modelo.Mascota;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -62,7 +60,7 @@ public class RegistroMascota {
 			return;
 		}
 
-		// Si la validación es exitosa, proceder a crear y guardar la mascota
+		// Si se valida, proceder a crear y guardar la mascota
 		String cedulaDueno = txtCedulaDueno.getText().trim();
 		String nombreMascota = txtNombreMascota.getText().trim();
 		String especie = txtEspecie.getText().trim();
@@ -79,9 +77,6 @@ public class RegistroMascota {
 		if (guardarMascotas(mascotas)) {
 			mostrarAlertaInformacion("Registro Exitoso", "Mascota '" + nombreMascota + "' registrada correctamente.");
 			limpiarCampos();
-			// Opcional: Cerrar la ventana de registro
-			// Stage stage = (Stage) btnRegistrarMascota.getScene().getWindow();
-			// stage.close();
 		} else {
 			mostrarAlertaError("Error de Registro", "No se pudo guardar la mascota. Intente de nuevo.");
 		}
@@ -202,7 +197,7 @@ public class RegistroMascota {
 		txtEdadMascota.clear();
 		cmbSexoMascota.getSelectionModel().clearSelection();
 		txtPesoMascota.clear();
-		txtCedulaDueno.requestFocus(); // Devolver foco al primer campo
+		txtCedulaDueno.requestFocus();
 	}
 
 	// Mostrar alerta

@@ -1,8 +1,7 @@
 // Paquete
 package pryfinal.controlador;
 
-// Imports JavaFX
-
+// Imports
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -17,7 +16,6 @@ import javafx.util.StringConverter;
 import pryfinal.modelo.HistoriaClinica;
 import pryfinal.modelo.Persona;
 import pryfinal.modelo.Usuario;
-
 import java.io.File;
 import java.io.IOException;
 import java.time.LocalDate;
@@ -32,7 +30,8 @@ import java.util.stream.Collectors;
 
 // Clase DetalleHistoriaClinica
 public class DetalleHistoriaClinica {
-
+	// Variables
+	/// FXML
 	@FXML private Label lblTituloDetalleHC;
 	@FXML private TextField txtCedulaDuenoHC;
 	@FXML private TextField txtNombreMascotaHC;
@@ -43,7 +42,6 @@ public class DetalleHistoriaClinica {
 	@FXML private TextArea areaDiagnosticoHC;
 	@FXML private TextArea areaTratamientoIndicadoHC;
 	@FXML private TextArea areaObservacionesHC;
-
 	@FXML private HBox botonesAccionBoxHC;
 	@FXML private Button btnModificarHC;
 	@FXML private Button btnEliminarHC;
@@ -52,11 +50,11 @@ public class DetalleHistoriaClinica {
 	@FXML private Button btnDescartarCambiosHC;
 	@FXML private Button btnCerrarDetalleHistoria;
 
+	/// Otros
 	private HistoriaClinica historiaSeleccionada;
 	private Usuario usuarioActual;
 	private ConsultaHistoriaClinica consultaHistoriaClinicaController;
 	private boolean enModoEdicion = false;
-
 	private ObjectMapper objectMapper;
 	private final String RUTA_HISTORIAS_JSON = "data/historias_clinicas.json";
 	private final String RUTA_PERSONAS_JSON = "data/personas.json";
@@ -65,7 +63,7 @@ public class DetalleHistoriaClinica {
 	private final Pattern PATRON_NOMBRE_MASCOTA = Pattern.compile("^[\\p{L}0-9 .'-]+$");
 	private ObservableList<String> listaNombresVeterinarios = FXCollections.observableArrayList();
 
-
+	// Initialize (inicializar)
 	@FXML
 	public void initialize() {
 		objectMapper = new ObjectMapper();
@@ -74,10 +72,12 @@ public class DetalleHistoriaClinica {
 		actualizarVisibilidadBotonesEdicion();
 	}
 
+	// Controlador consulta
 	public void setConsultaHistoriaClinicaController(ConsultaHistoriaClinica controller) {
 		this.consultaHistoriaClinicaController = controller;
 	}
 
+	// Date picker
 	private void configurarDatePickerEdit() {
 		dateFechaVisitaHCEdit.setConverter(new StringConverter<LocalDate>() {
 			@Override public String toString(LocalDate date) { return (date != null) ? FORMATO_FECHA_ISO.format(date) : ""; }
@@ -90,6 +90,7 @@ public class DetalleHistoriaClinica {
 		});
 	}
 
+	// Veterinarios
 	private void cargarVeterinariosParaEdicion() {
 		listaNombresVeterinarios.clear();
 		File archivoPersonas = new File(RUTA_PERSONAS_JSON);
@@ -107,6 +108,7 @@ public class DetalleHistoriaClinica {
 		if(historiaSeleccionada != null) cmbVeterinarioEncargadoHC.setValue(historiaSeleccionada.getVeterinario());
 	}
 
+	// Cargar
 	public void cargarDatos(HistoriaClinica historia, Usuario usuarioLogueado) {
 		this.historiaSeleccionada = historia;
 		this.usuarioActual = usuarioLogueado;
@@ -118,12 +120,12 @@ public class DetalleHistoriaClinica {
 			try { dateFechaVisitaHCEdit.setValue(LocalDate.parse(historia.getFecha(), FORMATO_FECHA_ISO)); }
 			catch (Exception e) { dateFechaVisitaHCEdit.setValue(null); }
 
-			// Configurar ComboBox Veterinario para modo solo lectura
+			// Configurar ComboBox Veterinario para modo "solo lectura"
 			if (historia.getVeterinario() != null && !historia.getVeterinario().isEmpty()) {
 				cmbVeterinarioEncargadoHC.setItems(FXCollections.observableArrayList(historia.getVeterinario()));
 				cmbVeterinarioEncargadoHC.setValue(historia.getVeterinario());
 			} else {
-				cmbVeterinarioEncargadoHC.setItems(FXCollections.observableArrayList()); // Lista vacía
+				cmbVeterinarioEncargadoHC.setItems(FXCollections.observableArrayList());
 				cmbVeterinarioEncargadoHC.setPromptText("No asignado");
 			}
 
@@ -136,12 +138,14 @@ public class DetalleHistoriaClinica {
 		salirModoEdicion();
 	}
 
+	// Rol de usuario
 	private void configurarSegunRolUsuario() {
 		boolean esAdmin = usuarioActual != null && ADMIN_USER_TYPE.equals(usuarioActual.getTipo());
 		btnModificarHC.setDisable(!esAdmin);
 		btnEliminarHC.setDisable(!esAdmin);
 	}
 
+	// Modo edicion
 	private void entrarModoEdicion() {
 		enModoEdicion = true;
 		lblTituloDetalleHC.setText("Modificar Historia Clínica");
@@ -160,6 +164,7 @@ public class DetalleHistoriaClinica {
 		actualizarVisibilidadBotonesEdicion();
 	}
 
+	// Salir de modo edicion
 	private void salirModoEdicion() {
 		enModoEdicion = false;
 		lblTituloDetalleHC.setText("Detalle de Historia Clínica");
@@ -177,6 +182,7 @@ public class DetalleHistoriaClinica {
 		actualizarVisibilidadBotonesEdicion();
 	}
 
+	// Valores originales
 	private void cargarValoresOriginales() {
 		txtNombreMascotaHC.setText(historiaSeleccionada.getNombre());
 		txtFechaVisitaHCDisplay.setText(historiaSeleccionada.getFecha());
@@ -197,6 +203,7 @@ public class DetalleHistoriaClinica {
 		areaObservacionesHC.setText(historiaSeleccionada.getObservaciones());
 	}
 
+	// Visibilidad botones
 	private void actualizarVisibilidadBotonesEdicion() {
 		botonesAccionBoxHC.setVisible(!enModoEdicion);
 		botonesAccionBoxHC.setManaged(!enModoEdicion);
@@ -205,9 +212,13 @@ public class DetalleHistoriaClinica {
 		btnCerrarDetalleHistoria.setVisible(!enModoEdicion);
 	}
 
+	// Modificar
 	@FXML private void handleModificarHC(ActionEvent event) { entrarModoEdicion(); }
+
+	// Descartar
 	@FXML private void handleDescartarCambiosHC(ActionEvent event) { salirModoEdicion(); }
 
+	// Guardar
 	@FXML
 	private void handleGuardarCambiosHC(ActionEvent event) {
 		if (historiaSeleccionada == null) return;
@@ -222,7 +233,6 @@ public class DetalleHistoriaClinica {
 		int indiceHistoria = -1;
 		for (int i = 0; i < historias.size(); i++) {
 			HistoriaClinica hc = historias.get(i);
-			// Clave para identificar: Cédula dueño, Nombre mascota, Fecha original
 			if (hc.getCedula() == historiaSeleccionada.getCedula() &&
 					hc.getNombre().equals(historiaSeleccionada.getNombre()) &&
 					hc.getFecha().equals(historiaSeleccionada.getFecha())) {
@@ -244,7 +254,7 @@ public class DetalleHistoriaClinica {
 
 			if (guardarHistoriasEnJson(historias)) {
 				mostrarAlerta("Éxito", "Historia clínica actualizada correctamente.");
-				this.historiaSeleccionada = historiaParaActualizar; // Actualizar referencia local
+				this.historiaSeleccionada = historiaParaActualizar;
 				if (consultaHistoriaClinicaController != null) {
 					consultaHistoriaClinicaController.refrescarListaHistorias();
 				}
@@ -257,6 +267,7 @@ public class DetalleHistoriaClinica {
 		salirModoEdicion();
 	}
 
+	// Eliminar
 	@FXML
 	private void handleEliminarHC(ActionEvent event) {
 		if (historiaSeleccionada == null) return;
@@ -273,7 +284,7 @@ public class DetalleHistoriaClinica {
 					hc.getCedula() == historiaSeleccionada.getCedula() &&
 					hc.getNombre().equals(historiaSeleccionada.getNombre()) &&
 					hc.getFecha().equals(historiaSeleccionada.getFecha()) &&
-					Objects.equals(hc.getVeterinario(), historiaSeleccionada.getVeterinario()) && // Añadir más campos para asegurar unicidad
+					Objects.equals(hc.getVeterinario(), historiaSeleccionada.getVeterinario()) &&
 					Objects.equals(hc.getMotivo(), historiaSeleccionada.getMotivo())
 					);
 
@@ -283,7 +294,7 @@ public class DetalleHistoriaClinica {
 					if (consultaHistoriaClinicaController != null) {
 						consultaHistoriaClinicaController.refrescarListaHistorias();
 					}
-					handleCerrar(null); // Cerrar ventana de detalle
+					handleCerrar(null);
 				} else {
 					mostrarAlertaError("Error", "No se pudo eliminar la historia clínica del archivo.");
 				}
@@ -293,45 +304,47 @@ public class DetalleHistoriaClinica {
 		}
 	}
 
+	// Validacion
 	private List<String> validarCamposParaModificacion() {
 		List<String> errores = new ArrayList<>();
 		String nombreMascota = txtNombreMascotaHC.getText().trim();
-		if (nombreMascota.isEmpty()) errores.add("- Nombre de mascota vacío.");
-		else if (nombreMascota.length() < 3 || nombreMascota.length() >= 40) errores.add("- Nombre mascota: 3-39 chars.");
-		else if (!PATRON_NOMBRE_MASCOTA.matcher(nombreMascota).matches()) errores.add("- Nombre mascota: letras, números, y '.- permitidos.");
+		if (nombreMascota.isEmpty()) errores.add("- Nombre de mascota no puede estar vacío.");
+		else if (nombreMascota.length() < 3 || nombreMascota.length() >= 40) errores.add("- Nombre de mascota debe tener entre 3 y 39 caracteres.");
+		else if (!PATRON_NOMBRE_MASCOTA.matcher(nombreMascota).matches()) errores.add("- Nombre de mascota solo debe contener letras, números y caracteres permitidos (espacios, ', ., -).");
 
-		if (dateFechaVisitaHCEdit.getValue() == null) errores.add("- Fecha de visita vacía.");
+		if (dateFechaVisitaHCEdit.getValue() == null) errores.add("- Fecha de visita no puede estar vacía.");
 		String fechaEditor = dateFechaVisitaHCEdit.getEditor().getText();
 		if (!fechaEditor.isEmpty()) {
 			try { LocalDate.parse(fechaEditor, FORMATO_FECHA_ISO); }
-			catch (DateTimeParseException e) { errores.add("- Fecha visita: formato AAAA-MM-DD inválido."); }
+			catch (DateTimeParseException e) { errores.add("- Fecha de visita tiene un formato inválido. Use AAAA-MM-DD."); }
 		} else if(dateFechaVisitaHCEdit.getValue() == null){
 			errores.add("- Fecha de visita vacía.");
 		}
 
 		if (cmbVeterinarioEncargadoHC.getValue() == null || cmbVeterinarioEncargadoHC.getValue().isEmpty()) {
-			errores.add("- Debe seleccionar un veterinario.");
+			errores.add("- Debe seleccionar un veterinario encargado.");
 		}
 
 		String motivo = areaMotivoConsultaHC.getText().trim();
-		if (motivo.isEmpty()) errores.add("- Motivo consulta vacío.");
-		else if (motivo.length() < 3 || motivo.length() > 975) errores.add("- Motivo consulta: 3-975 chars.");
+		if (motivo.isEmpty()) errores.add("- Motivo de la consulta no puede estar vacío.");
+		else if (motivo.length() < 3 || motivo.length() > 975) errores.add("- Motivo de la consulta debe tener entre 3 y 975 caracteres.");
 
 		String diagnostico = areaDiagnosticoHC.getText().trim();
-		if (diagnostico.isEmpty()) errores.add("- Diagnóstico vacío.");
-		else if (diagnostico.length() < 3 || diagnostico.length() > 975) errores.add("- Diagnóstico: 3-975 chars.");
+		if (diagnostico.isEmpty()) errores.add("- Diagnóstico no puede estar vacío.");
+		else if (diagnostico.length() < 3 || diagnostico.length() > 975) errores.add("- Diagnóstico debe tener entre 3 y 975 caracteres.");
 
 		String tratamiento = areaTratamientoIndicadoHC.getText().trim();
-		if (tratamiento.isEmpty()) errores.add("- Tratamiento indicado vacío.");
-		else if (tratamiento.length() < 3 || tratamiento.length() > 975) errores.add("- Tratamiento: 3-975 chars.");
+		if (tratamiento.isEmpty()) errores.add("- Tratamiento indicado no puede estar vacío.");
+		else if (tratamiento.length() < 3 || tratamiento.length() > 975) errores.add("- Tratamiento indicado debe tener entre 3 y 975 caracteres.");
 
 		String observaciones = areaObservacionesHC.getText().trim();
 		if (!observaciones.isEmpty() && (observaciones.length() < 3 || observaciones.length() > 975)) {
-			errores.add("- Observaciones (si se ingresa): 3-975 chars.");
+			errores.add("- Observaciones debe tener entre 3 y 975 caracteres si se ingresa.");
 		}
 		return errores;
 	}
 
+	// Cargar
 	private List<HistoriaClinica> cargarHistoriasDesdeJson() {
 		File archivo = new File(RUTA_HISTORIAS_JSON);
 		if (archivo.exists() && archivo.length() > 0) {
@@ -341,26 +354,34 @@ public class DetalleHistoriaClinica {
 		return new ArrayList<>();
 	}
 
+	// Guardar
 	private boolean guardarHistoriasEnJson(List<HistoriaClinica> historias) {
 		try { objectMapper.writeValue(new File(RUTA_HISTORIAS_JSON), historias); return true; }
 		catch (IOException e) { System.err.println("Error al guardar historias: " + e.getMessage()); return false; }
 	}
 
-	@FXML private void handleCerrar(ActionEvent event) {
-	Stage stage = (Stage) btnCerrarDetalleHistoria.getScene().getWindow();
-	stage.close();
+	// Cerrar
+	@FXML
+	private void handleCerrar(ActionEvent event) {
+		Stage stage = (Stage) btnCerrarDetalleHistoria.getScene().getWindow();
+		stage.close();
 	}
 
+	// Alerta
 	private void mostrarAlerta(String titulo, String mensaje) {
 		Alert alert = new Alert(Alert.AlertType.INFORMATION);
 		alert.setTitle(titulo); alert.setHeaderText(null); alert.setContentText(mensaje);
 		alert.showAndWait();
 	}
+
+	/// Error
 	private void mostrarAlertaError(String titulo, String mensaje) {
 		Alert alert = new Alert(Alert.AlertType.ERROR);
 		alert.setTitle(titulo); alert.setHeaderText(null); alert.setContentText(mensaje);
 		alert.showAndWait();
 	}
+
+	/// Validacion
 	private void mostrarAlertaValidacion(String titulo, List<String> mensajes) {
 		Alert alert = new Alert(Alert.AlertType.WARNING);
 		alert.setTitle(titulo);

@@ -2,7 +2,6 @@
 package pryfinal.controlador;
 
 // Imports
-
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -11,7 +10,6 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.util.StringConverter;
 import pryfinal.modelo.Factura;
-
 import java.io.File;
 import java.io.IOException;
 import java.text.DecimalFormat;
@@ -90,7 +88,7 @@ public class RegistroFactura {
 						return LocalDate.parse(string, FORMATO_FECHA);
 					} catch (DateTimeParseException e) {
 						System.err.println("Formato de fecha inválido ingresado manualmente: " + string);
-						return dateFechaEmision.getValue(); // Mantener valor anterior o null si es el primero
+						return dateFechaEmision.getValue();
 					}
 				} else {
 					return null;
@@ -114,7 +112,7 @@ public class RegistroFactura {
 			String ivaPorcentajeStr = txtIVAFactura.getText().trim();
 
 			if (subtotalStr.isEmpty() || ivaPorcentajeStr.isEmpty()) {
-				txtTotalFactura.setText(""); // Si alguno está vacío, el total también
+				txtTotalFactura.setText("");
 				return;
 			}
 
