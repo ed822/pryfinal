@@ -5,10 +5,10 @@
 <?import javafx.scene.layout.*?>
 <VBox xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="pryfinal.controlador.MenuPrincipal" alignment="TOP_CENTER" spacing="15" style="-fx-padding: 20;">
 
-		<!-- Contenedor para el título y el botón de logout -->
+	<!-- Contenedor para el título y el botón de logout -->
 	<HBox alignment="CENTER_LEFT" spacing="10" VBox.vgrow="NEVER">
 		<Label text="Menú Principal - Gestión Veterinaria" textAlignment="CENTER" style="-fx-font-size: 22px; -fx-font-weight: bold;"/>
-		<Region HBox.hgrow="ALWAYS"/> <!-- Spacer para empujar el botón a la derecha -->
+		<Region HBox.hgrow="ALWAYS"/>
 		<Button fx:id="btnCerrarSesion" text="Cerrar Sesión" onAction="#handleCerrarSesion"
 			minWidth="100" prefWidth="120" style="-fx-font-size: 12px; -fx-base: #FFAB91;"/>
 		<HBox.margin>

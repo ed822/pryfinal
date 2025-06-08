@@ -23,7 +23,6 @@
 		<TextField fx:id="txtNumeroFactura" editable="false" focusTraversable="false" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
 
 		<Label text="Fecha de Emisión:" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
-		<!-- TextField para modo lectura, DatePicker para modo edición -->
 		<TextField fx:id="txtFechaEmisionDisplay" editable="false" focusTraversable="false" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
 		<DatePicker fx:id="dateFechaEmisionEdit" visible="false" managed="false" prefWidth="280.0" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
 
@@ -43,7 +42,7 @@
 		<TextField fx:id="txtIVA" editable="false" focusTraversable="false" GridPane.rowIndex="6" GridPane.columnIndex="1"/>
 
 		<Label text="Total:" GridPane.rowIndex="7" GridPane.columnIndex="0"/>
-		<TextField fx:id="txtTotal" editable="false" focusTraversable="false" GridPane.rowIndex="7" GridPane.columnIndex="1"/> <!-- Total sigue siendo no editable directamente -->
+		<TextField fx:id="txtTotal" editable="false" focusTraversable="false" GridPane.rowIndex="7" GridPane.columnIndex="1"/>
 
 		<Label text="Método de Pago:" GridPane.rowIndex="8" GridPane.columnIndex="0"/>
 		<ComboBox fx:id="cmbMetodoPago" disable="true" prefWidth="280.0" GridPane.rowIndex="8" GridPane.columnIndex="1">
