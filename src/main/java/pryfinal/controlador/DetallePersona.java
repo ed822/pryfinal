@@ -1,8 +1,7 @@
 // Paquete
 package pryfinal.controlador;
 
-// Imports JavaFX
-
+// Imports
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -14,7 +13,6 @@ import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 import pryfinal.modelo.Persona;
 import pryfinal.modelo.Usuario;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -24,7 +22,8 @@ import java.util.regex.Pattern;
 
 // Clase DetallePersona
 public class DetallePersona {
-
+	// Variables
+	/// FXML
 	@FXML private Label lblTituloDetallePersona;
 	@FXML private TextField txtCedulaPersona;
 	@FXML private TextField txtNombrePersona;
@@ -33,41 +32,40 @@ public class DetallePersona {
 	@FXML private TextField txtCelular;
 	@FXML private TextField txtDireccion;
 	@FXML private TextField txtEmail;
-
 	@FXML private HBox botonesAccionBoxPersona;
 	@FXML private Button btnModificarPersona;
 	@FXML private Button btnEliminarPersona;
-
 	@FXML private HBox botonesEdicionBoxPersona;
 	@FXML private Button btnGuardarCambiosPersona;
 	@FXML private Button btnDescartarCambiosPersona;
-
 	@FXML private Button btnCerrarDetallePersona;
 
+	/// Otros
 	private Persona personaSeleccionada;
 	private Usuario usuarioActual;
-	private ConsultaPersona consultaPersonaController; // CORREGIDO AQUÍ
+	private ConsultaPersona consultaPersonaController;
 	private boolean enModoEdicion = false;
-
 	private ObjectMapper objectMapper;
 	private final String RUTA_PERSONAS_JSON = "data/personas.json";
 	private final String ADMIN_USER_TYPE = "admin";
 	private final Pattern PATRON_NOMBRE_APELLIDO = Pattern.compile("^[\\p{L} .'-]+$");
 	private final Pattern PATRON_EMAIL = Pattern.compile("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,6}$");
 
+	// Initialize (inicializar)
 	@FXML
 	public void initialize() {
 		objectMapper = new ObjectMapper();
 		objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
-		// Items del ComboBox ya están en FXML
 		cmbTipoPersona.setItems(FXCollections.observableArrayList("Dueño de Mascota", "Veterinario", "Encargado de bodega"));
 		actualizarVisibilidadBotonesEdicion();
 	}
 
-	public void setConsultaPersonaController(ConsultaPersona controller) { // CORREGIDO AQUÍ
+	// Controlador
+	public void setConsultaPersonaController(ConsultaPersona controller) {
 		this.consultaPersonaController = controller;
 	}
 
+	// Cargar
 	public void cargarDatos(Persona persona, Usuario usuarioLogueado) {
 		this.personaSeleccionada = persona;
 		this.usuarioActual = usuarioLogueado;
@@ -85,12 +83,14 @@ public class DetallePersona {
 		salirModoEdicion();
 	}
 
+	// Rol de usuario
 	private void configurarSegunRolUsuario() {
 		boolean esAdmin = usuarioActual != null && ADMIN_USER_TYPE.equals(usuarioActual.getTipo());
 		btnModificarPersona.setDisable(!esAdmin);
 		btnEliminarPersona.setDisable(!esAdmin);
 	}
 
+	// Modo edicion
 	private void entrarModoEdicion() {
 		enModoEdicion = true;
 		lblTituloDetallePersona.setText("Modificar Persona");
@@ -103,6 +103,7 @@ public class DetallePersona {
 		actualizarVisibilidadBotonesEdicion();
 	}
 
+	// Saliar modo edicion
 	private void salirModoEdicion() {
 		enModoEdicion = false;
 		lblTituloDetallePersona.setText("Detalle de Persona");
@@ -118,6 +119,7 @@ public class DetallePersona {
 		actualizarVisibilidadBotonesEdicion();
 	}
 
+	// Valores originales
 	private void cargarValoresOriginales() {
 		txtNombrePersona.setText(personaSeleccionada.getNombre());
 		txtApellido.setText(personaSeleccionada.getApellido());
@@ -127,6 +129,7 @@ public class DetallePersona {
 		txtEmail.setText(personaSeleccionada.getEmail());
 	}
 
+	// Visibilidad botones
 	private void actualizarVisibilidadBotonesEdicion() {
 		botonesAccionBoxPersona.setVisible(!enModoEdicion);
 		botonesAccionBoxPersona.setManaged(!enModoEdicion);
@@ -135,11 +138,11 @@ public class DetallePersona {
 		btnCerrarDetallePersona.setVisible(!enModoEdicion);
 	}
 
+	// Modificar
 	@FXML
-	private void handleModificarPersona(ActionEvent event) {
-		entrarModoEdicion();
-	}
+	private void handleModificarPersona(ActionEvent event) { entrarModoEdicion(); }
 
+	// Guardar
 	@FXML
 	private void handleGuardarCambiosPersona(ActionEvent event) {
 		if (personaSeleccionada == null) return;
@@ -172,7 +175,7 @@ public class DetallePersona {
 			if (guardarPersonasEnJson(personas)) {
 				mostrarAlerta("Éxito", "Persona actualizada correctamente.");
 				this.personaSeleccionada = personaParaActualizar;
-				if (consultaPersonaController != null) { // CORREGIDO AQUÍ
+				if (consultaPersonaController != null) {
 					consultaPersonaController.refrescarListaPersonas();
 				}
 			} else {
@@ -184,11 +187,11 @@ public class DetallePersona {
 		salirModoEdicion();
 	}
 
+	// Descartar cambios
 	@FXML
-	private void handleDescartarCambiosPersona(ActionEvent event) {
-		salirModoEdicion();
-	}
+	private void handleDescartarCambiosPersona(ActionEvent event) { salirModoEdicion(); }
 
+	// Eliminar
 	@FXML
 	private void handleEliminarPersona(ActionEvent event) {
 		if (personaSeleccionada == null) return;
@@ -206,7 +209,7 @@ public class DetallePersona {
 			if (eliminada) {
 				if (guardarPersonasEnJson(personas)) {
 					mostrarAlerta("Éxito", "Persona eliminada correctamente.");
-					if (consultaPersonaController != null) { // CORREGIDO AQUÍ
+					if (consultaPersonaController != null) {
 						consultaPersonaController.refrescarListaPersonas();
 					}
 					handleCerrar(null);
@@ -219,36 +222,38 @@ public class DetallePersona {
 		}
 	}
 
+	// Validar
 	private List<String> validarCamposParaModificacion() {
 		List<String> errores = new ArrayList<>();
 		String nombre = txtNombrePersona.getText().trim();
 		if (nombre.isEmpty()) errores.add("- Nombre no puede estar vacío.");
-		else if (nombre.length() < 3 || nombre.length() >= 40) errores.add("- Nombre: 3-39 caracteres.");
-		else if (!PATRON_NOMBRE_APELLIDO.matcher(nombre).matches()) errores.add("- Nombre: solo letras/caracteres permitidos.");
+		else if (nombre.length() < 3 || nombre.length() >= 40) errores.add("- Nombre debe tener entre 3 y 39 caracteres.");
+		else if (!PATRON_NOMBRE_APELLIDO.matcher(nombre).matches()) errores.add("- Nombre solo debe contener letras y caracteres permitidos (espacios, ', ., -).");
 
 		String apellido = txtApellido.getText().trim();
 		if (apellido.isEmpty()) errores.add("- Apellido no puede estar vacío.");
-		else if (apellido.length() < 3 || apellido.length() >= 40) errores.add("- Apellido: 3-39 caracteres.");
-		else if (!PATRON_NOMBRE_APELLIDO.matcher(apellido).matches()) errores.add("- Apellido: solo letras/caracteres permitidos.");
+		else if (apellido.length() < 3 || apellido.length() >= 40) errores.add("- Apellido debe tener entre 3 y 39 caracteres.");
+		else if (!PATRON_NOMBRE_APELLIDO.matcher(apellido).matches()) errores.add("- Apellido solo debe contener letras y caracteres permitidos.");
 
 		if (cmbTipoPersona.getValue() == null || cmbTipoPersona.getValue().isEmpty()) errores.add("- Debe seleccionar un tipo de persona.");
 
 		String celularStr = txtCelular.getText().trim();
-		if (celularStr.isEmpty()) errores.add("- Celular no puede estar vacío.");
-		else if (!celularStr.matches("\\d+")) errores.add("- Celular: solo números.");
-		else if (celularStr.length() < 5 || celularStr.length() > 13) errores.add("- Celular: 5-13 dígitos.");
+		if (celularStr.isEmpty()) errores.add("- Número de celular no puede estar vacío.");
+		else if (!celularStr.matches("\\d+")) errores.add("- Número de celular debe contener solo números.");
+		else if (celularStr.length() < 5 || celularStr.length() > 13) errores.add("- Número de celular debe tener entre 5 y 13 dígitos.");
 
 		String direccion = txtDireccion.getText().trim();
 		if (direccion.isEmpty()) errores.add("- Dirección no puede estar vacía.");
-		else if (direccion.length() < 3 || direccion.length() > 180) errores.add("- Dirección: 3-180 caracteres.");
+		else if (direccion.length() < 3 || direccion.length() > 180) errores.add("- Dirección debe tener entre 3 y 180 caracteres.");
 
 		String email = txtEmail.getText().trim();
 		if (email.isEmpty()) errores.add("- Email no puede estar vacío.");
-		else if (!PATRON_EMAIL.matcher(email).matches()) errores.add("- Email no tiene un formato válido.");
+		else if (!PATRON_EMAIL.matcher(email).matches()) errores.add("- Email no tiene un formato válido (ej: usuario@dominio.com).");
 
 		return errores;
 	}
 
+	// Cargar
 	private List<Persona> cargarPersonasDesdeJson() {
 		File archivo = new File(RUTA_PERSONAS_JSON);
 		if (archivo.exists() && archivo.length() > 0) {
@@ -258,27 +263,34 @@ public class DetallePersona {
 		return new ArrayList<>();
 	}
 
+	// Guardar
 	private boolean guardarPersonasEnJson(List<Persona> personas) {
 		try { objectMapper.writeValue(new File(RUTA_PERSONAS_JSON), personas); return true; }
 		catch (IOException e) { System.err.println("Error al guardar personas: " + e.getMessage()); return false; }
 	}
 
+	// Cerrar
 	@FXML
 	private void handleCerrar(ActionEvent event) {
 		Stage stage = (Stage) btnCerrarDetallePersona.getScene().getWindow();
 		stage.close();
 	}
 
+	// Alerta
 	private void mostrarAlerta(String titulo, String mensaje) {
 		Alert alert = new Alert(Alert.AlertType.INFORMATION);
 		alert.setTitle(titulo); alert.setHeaderText(null); alert.setContentText(mensaje);
 		alert.showAndWait();
 	}
+
+	/// Error
 	private void mostrarAlertaError(String titulo, String mensaje) {
 		Alert alert = new Alert(Alert.AlertType.ERROR);
 		alert.setTitle(titulo); alert.setHeaderText(null); alert.setContentText(mensaje);
 		alert.showAndWait();
 	}
+
+	/// Validacion
 	private void mostrarAlertaValidacion(String titulo, List<String> mensajes) {
 		Alert alert = new Alert(Alert.AlertType.WARNING);
 		alert.setTitle(titulo);

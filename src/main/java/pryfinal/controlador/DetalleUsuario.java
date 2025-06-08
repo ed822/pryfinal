@@ -1,8 +1,7 @@
 // Paquete
 package pryfinal.controlador;
 
-// Imports JavaFX
-
+// Imports
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -13,7 +12,6 @@ import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 import pryfinal.modelo.Usuario;
-
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -26,30 +24,29 @@ import java.util.Optional;
 
 // Clase DetalleUsuario
 public class DetalleUsuario {
-
+	// Variables
+	/// FXML
 	@FXML private Label lblTituloDetalleUsuario;
 	@FXML private TextField txtNombreUsuarioDetalle;
 	@FXML private ComboBox<String> cmbTipoUsuarioDetalle;
 	@FXML private Label lblContrasena;
 	@FXML private PasswordField txtContrasenaDetalle;
-
 	@FXML private HBox botonesAccionBox;
 	@FXML private Button btnModificarUsuario;
 	@FXML private Button btnEliminarUsuario;
-
 	@FXML private HBox botonesEdicionBox;
 	@FXML private Button btnGuardarCambios;
 	@FXML private Button btnDescartarCambios;
-
 	@FXML private Button btnCerrarDetalle;
 
+	// Otros
 	private Usuario usuarioSeleccionado;
 	private boolean enModoEdicion = false;
-	private ConsultaUsuario consultaUsuarioController; // Corregido
-
+	private ConsultaUsuario consultaUsuarioController;
 	private ObjectMapper objectMapper;
 	private final String RUTA_USUARIOS_JSON = "data/usuarios.json";
 
+	// Initialize (inicializar)
 	@FXML
 	public void initialize() {
 		objectMapper = new ObjectMapper();
@@ -58,10 +55,12 @@ public class DetalleUsuario {
 		actualizarVisibilidadBotonesEdicion();
 	}
 
-	public void setConsultaUsuarioController(ConsultaUsuario controller) { // Corregido
+	// Consulta controlador
+	public void setConsultaUsuarioController(ConsultaUsuario controller) {
 		this.consultaUsuarioController = controller;
 	}
 
+	// Cargar
 	public void cargarDatos(Usuario usuario) {
 		this.usuarioSeleccionado = usuario;
 		if (usuario != null) {
@@ -73,11 +72,13 @@ public class DetalleUsuario {
 		salirModoEdicion();
 	}
 
+	// Modificar
 	@FXML
 	private void handleModificarUsuario(ActionEvent event) {
 		entrarModoEdicion();
 	}
 
+	// Modo edicion
 	private void entrarModoEdicion() {
 		enModoEdicion = true;
 		lblTituloDetalleUsuario.setText("Modificar Usuario");
@@ -88,6 +89,7 @@ public class DetalleUsuario {
 		actualizarVisibilidadBotonesEdicion();
 	}
 
+	// Salir de modo edicion
 	private void salirModoEdicion() {
 		enModoEdicion = false;
 		lblTituloDetalleUsuario.setText("Detalle de Usuario");
@@ -101,6 +103,7 @@ public class DetalleUsuario {
 		actualizarVisibilidadBotonesEdicion();
 	}
 
+	// Visivilidad de botones
 	private void actualizarVisibilidadBotonesEdicion() {
 		botonesAccionBox.setVisible(!enModoEdicion);
 		botonesAccionBox.setManaged(!enModoEdicion);
@@ -109,6 +112,7 @@ public class DetalleUsuario {
 		btnCerrarDetalle.setVisible(!enModoEdicion);
 	}
 
+	// Guardar
 	@FXML
 	private void handleGuardarCambios(ActionEvent event) {
 		if (usuarioSeleccionado == null) return;
@@ -155,12 +159,14 @@ public class DetalleUsuario {
 		cargarDatos(this.usuarioSeleccionado);
 	}
 
+	// Descartar
 	@FXML
 	private void handleDescartarCambios(ActionEvent event) {
 		salirModoEdicion();
 		cargarDatos(this.usuarioSeleccionado);
 	}
 
+	// Eliminar
 	@FXML
 	private void handleEliminarUsuario(ActionEvent event) {
 		if (usuarioSeleccionado == null) return;
@@ -191,12 +197,14 @@ public class DetalleUsuario {
 		}
 	}
 
+	// Cerrar ventana
 	@FXML
 	private void handleCerrarVentana(ActionEvent event) {
 		Stage stage = (Stage) btnCerrarDetalle.getScene().getWindow();
 		stage.close();
 	}
 
+	// Cargar usuarios
 	private List<Usuario> cargarUsuarios() {
 		File archivo = new File(RUTA_USUARIOS_JSON);
 		if (archivo.exists() && archivo.length() > 0) {
@@ -206,11 +214,13 @@ public class DetalleUsuario {
 		return new ArrayList<>();
 	}
 
+	// Guardar usuarios
 	private boolean guardarUsuarios(List<Usuario> usuarios) {
 		try { objectMapper.writeValue(new File(RUTA_USUARIOS_JSON), usuarios); return true; }
 		catch (IOException e) { System.err.println("Error al guardar usuarios: " + e.getMessage()); return false; }
 	}
 
+	// Hashear contrasena
 	private String hashearContrasena(String contrasena) {
 		try {
 			MessageDigest digest = MessageDigest.getInstance("SHA-256");
@@ -225,11 +235,14 @@ public class DetalleUsuario {
 		}
 	}
 
+	// Alerta
 	private void mostrarAlerta(String titulo, String mensaje) {
 		Alert alert = new Alert(Alert.AlertType.INFORMATION);
 		alert.setTitle(titulo); alert.setHeaderText(null); alert.setContentText(mensaje);
 		alert.showAndWait();
 	}
+
+	/// Error
 	private void mostrarAlertaError(String titulo, String mensaje) {
 		Alert alert = new Alert(Alert.AlertType.ERROR);
 		alert.setTitle(titulo); alert.setHeaderText(null); alert.setContentText(mensaje);

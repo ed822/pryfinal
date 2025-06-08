@@ -1,8 +1,7 @@
 // Paquete
 package pryfinal.controlador;
 
-// Imports JavaFX
-
+// Imports
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import javafx.collections.FXCollections;
@@ -20,30 +19,30 @@ import javafx.scene.input.MouseEvent;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import pryfinal.modelo.Usuario;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
-// Clase ConsultaUsuario (antes ConsultarUsuario)
+// Clase ConsultaUsuario
 public class ConsultaUsuario {
-
+	// Variables
+	/// FXML
 	@FXML private TextField txtBuscarUsuario;
 	@FXML private Button btnRefrescarUsuarios;
 	@FXML private TableView<Usuario> tablaUsuarios;
 	@FXML private Button btnCerrarConsultaUsuarios;
-
 	@FXML private TableColumn<Usuario, String> colNombreUsuario;
 	@FXML private TableColumn<Usuario, String> colTipoUsuario;
 
+	/// Otros
 	private ObjectMapper objectMapper;
 	private final String RUTA_USUARIOS_JSON = "data/usuarios.json";
 	private final String ADMIN_USER_TYPE = "admin";
-
 	private ObservableList<Usuario> listaObservableUsuarios = FXCollections.observableArrayList();
 	private FilteredList<Usuario> usuariosFiltrados;
 
+	// Initialize (inicializar)
 	@FXML
 	public void initialize() {
 		objectMapper = new ObjectMapper();
@@ -53,11 +52,13 @@ public class ConsultaUsuario {
 		configurarDobleClicEnTabla();
 	}
 
+	// Tabla
 	private void configurarColumnasTabla() {
 		colNombreUsuario.setCellValueFactory(new PropertyValueFactory<>("nombre"));
 		colTipoUsuario.setCellValueFactory(new PropertyValueFactory<>("tipo"));
 	}
 
+	// Cargar
 	private void cargarYMostrarUsuarios() {
 		listaObservableUsuarios.clear();
 		File archivo = new File(RUTA_USUARIOS_JSON);
@@ -76,6 +77,7 @@ public class ConsultaUsuario {
 		}
 	}
 
+	// Filtros
 	private void configurarFiltroBusqueda() {
 		usuariosFiltrados = new FilteredList<>(listaObservableUsuarios, p -> true);
 
@@ -95,6 +97,7 @@ public class ConsultaUsuario {
 		tablaUsuarios.setItems(usuariosOrdenados);
 	}
 
+	// Doble click
 	private void configurarDobleClicEnTabla() {
 		tablaUsuarios.setOnMouseClicked((MouseEvent event) -> {
 			if (event.getClickCount() == 2) {
@@ -106,13 +109,14 @@ public class ConsultaUsuario {
 		});
 	}
 
+	// Detalles
 	private void mostrarDetalleUsuario(Usuario usuario) {
 		try {
 			FXMLLoader loader = new FXMLLoader(getClass().getResource("/pryfinal/vista/DetalleUsuario.fxml"));
 			Parent root = loader.load();
 
 			DetalleUsuario controller = loader.getController();
-			controller.setConsultaUsuarioController(this); // CORREGIDO AQUÍ
+			controller.setConsultaUsuarioController(this);
 			controller.cargarDatos(usuario);
 
 
@@ -132,23 +136,24 @@ public class ConsultaUsuario {
 		}
 	}
 
+	// Refrescar
 	@FXML
 	private void handleRefrescarUsuarios(ActionEvent event) {
 		txtBuscarUsuario.clear();
 		cargarYMostrarUsuarios();
 		mostrarAlertaInformacion("Datos Actualizados", "La lista de usuarios ha sido refrescada.");
 	}
+	public void refrescarListaUsuarios() { cargarYMostrarUsuarios(); }
 
-	public void refrescarListaUsuarios() {
-		cargarYMostrarUsuarios();
-	}
-
+	// Cerrar
 	@FXML
 	private void handleCerrarConsultaUsuarios(ActionEvent event) {
 		Stage stage = (Stage) btnCerrarConsultaUsuarios.getScene().getWindow();
 		stage.close();
 	}
 
+	// Alerta
+	/// Informacion
 	private void mostrarAlertaInformacion(String titulo, String mensaje) {
 		Alert alert = new Alert(Alert.AlertType.INFORMATION);
 		alert.setTitle(titulo);
@@ -157,6 +162,7 @@ public class ConsultaUsuario {
 		alert.showAndWait();
 	}
 
+	/// Error
 	private void mostrarAlertaError(String titulo, String mensaje) {
 		Alert alert = new Alert(Alert.AlertType.ERROR);
 		alert.setTitle(titulo);
